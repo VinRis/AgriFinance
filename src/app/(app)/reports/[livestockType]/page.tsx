@@ -1,6 +1,6 @@
 'use client';
 import { notFound } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { LivestockType } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
@@ -8,20 +8,21 @@ import { Download } from 'lucide-react';
 
 export default function ReportsPage({ params }: { params: { livestockType: string } }) {
   const { livestockType } = params;
-  const { getRecords, settings } = useAppContext();
+  const { getTransactions, settings } = useAppContext();
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
     notFound();
   }
   
   const title = livestockType === 'dairy' ? 'Dairy Reports' : 'Poultry Reports';
-  const records = getRecords(livestockType as LivestockType);
+  const transactions = getTransactions(livestockType as LivestockType);
 
   const generateCSV = () => {
-    const headers = Object.keys(records[0] || {}).join(',');
+    if (transactions.length === 0) return;
+    const headers = Object.keys(transactions[0] || {}).join(',');
     const csv = [
       headers,
-      ...records.map(row =>
+      ...transactions.map(row =>
         Object.values(row).map(value => JSON.stringify(value, (_, val) => val ?? '')).join(',')
       )
     ].join('\n');
@@ -55,7 +56,7 @@ export default function ReportsPage({ params }: { params: { livestockType: strin
           <CardContent>
             <p>You can export your data as a CSV file or print a summary of your records.</p>
             <div className="mt-6 flex gap-4">
-                 <Button onClick={generateCSV} disabled={records.length === 0}>
+                 <Button onClick={generateCSV} disabled={transactions.length === 0}>
                     <Download className="mr-2" />
                     Export as CSV
                 </Button>
@@ -70,13 +71,13 @@ export default function ReportsPage({ params }: { params: { livestockType: strin
           <table className="w-full border-collapse border">
             <thead>
               <tr>
-                {records.length > 0 && Object.keys(records[0]).map(key => <th className="border p-2 text-left" key={key}>{key}</th>)}
+                {transactions.length > 0 && Object.keys(transactions[0]).map(key => <th className="border p-2 text-left" key={key}>{key}</th>)}
               </tr>
             </thead>
             <tbody>
-              {records.map(record => (
-                <tr key={record.id}>
-                  {Object.values(record).map((val, i) => <td className="border p-2" key={i}>{String(val)}</td>)}
+              {transactions.map(transaction => (
+                <tr key={transaction.id}>
+                  {Object.values(transaction).map((val, i) => <td className="border p-2" key={i}>{String(val)}</td>)}
                 </tr>
               ))}
             </tbody>

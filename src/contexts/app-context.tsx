@@ -1,25 +1,23 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { AgriRecord, AppSettings, LivestockType } from '@/lib/types';
+import { AgriTransaction, AppSettings, LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 type State = {
-  records: AgriRecord[];
+  transactions: AgriTransaction[];
   settings: AppSettings;
 };
 
 type Action =
-  | { type: 'ADD_RECORD'; payload: AgriRecord }
-  | { type: 'UPDATE_RECORD'; payload: AgriRecord }
-  | { type: 'DELETE_RECORD'; payload: string }
-  | { type: 'DELETE_RECORDS'; payload: string[] }
-  | { type: 'UPDATE_SETTINGS'; payload: Partial<AppSettings> }
-  | { type: 'SET_ALL_DATA'; payload: State };
+  | { type: 'ADD_TRANSACTION'; payload: AgriTransaction }
+  | { type: 'UPDATE_TRANSACTION'; payload: AgriTransaction }
+  | { type: 'DELETE_TRANSACTION'; payload: string }
+  | { type: 'UPDATE_SETTINGS'; payload: Partial<AppSettings> };
 
 type AppContextType = State & {
   dispatch: React.Dispatch<Action>;
-  getRecords: (type: LivestockType) => AgriRecord[];
+  getTransactions: (type: LivestockType) => AgriTransaction[];
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,21 +31,17 @@ const defaultSettings: AppSettings = {
 
 function appReducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'ADD_RECORD':
-      return { ...state, records: [...state.records, action.payload] };
-    case 'UPDATE_RECORD':
+    case 'ADD_TRANSACTION':
+      return { ...state, transactions: [...state.transactions, action.payload] };
+    case 'UPDATE_TRANSACTION':
       return {
         ...state,
-        records: state.records.map((r) => (r.id === action.payload.id ? action.payload : r)),
+        transactions: state.transactions.map((t) => (t.id === action.payload.id ? action.payload : t)),
       };
-    case 'DELETE_RECORD':
-      return { ...state, records: state.records.filter((r) => r.id !== action.payload) };
-    case 'DELETE_RECORDS':
-      return { ...state, records: state.records.filter((r) => !action.payload.includes(r.id)) };
+    case 'DELETE_TRANSACTION':
+      return { ...state, transactions: state.transactions.filter((t) => t.id !== action.payload) };
     case 'UPDATE_SETTINGS':
       return { ...state, settings: { ...state.settings, ...action.payload } };
-    case 'SET_ALL_DATA':
-      return action.payload;
     default:
       return state;
   }
@@ -55,7 +49,7 @@ function appReducer(state: State, action: Action): State {
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [storedState, setStoredState] = useLocalStorage<State>('agri-finance-pro-data', {
-    records: [],
+    transactions: [],
     settings: defaultSettings,
   });
 
@@ -67,12 +61,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     dispatch(action);
   };
   
-  const getRecords = (type: LivestockType) => {
-    return state.records.filter(record => record.type === type);
+  const getTransactions = (type: LivestockType) => {
+    return state.transactions.filter(transaction => transaction.livestockType === type);
   };
 
   return (
-    <AppContext.Provider value={{ ...state, dispatch: enhancedDispatch, getRecords }}>
+    <AppContext.Provider value={{ ...state, dispatch: enhancedDispatch, getTransactions }}>
       {children}
     </AppContext.Provider>
   );

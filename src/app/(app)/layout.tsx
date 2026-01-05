@@ -1,8 +1,27 @@
 'use client';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { NavLinks } from '@/components/layout/nav-links';
 import { Header } from '@/components/layout/header';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { RecordForm } from './records/[livestockType]/record-form';
+import { LivestockType } from '@/lib/types';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [isFormOpen, setFormOpen] = useState(false);
+  const segments = pathname.split('/');
+  const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
+  
+  const pathLivestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
+  const livestockType = (pathLivestockType || lastSelectedType) as LivestockType;
+
+  const handleFabClick = () => {
+    setFormOpen(true);
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Header />
@@ -11,7 +30,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
-       <NavLinks />
+      <NavLinks />
+      {pathname !== '/' && (
+         <>
+            <Button
+              onClick={handleFabClick}
+              className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-lg z-20"
+              size="icon"
+            >
+              <Plus className="h-8 w-8" />
+              <span className="sr-only">Add Record</span>
+            </Button>
+            <RecordForm 
+                livestockType={livestockType}
+                isOpen={isFormOpen}
+                onClose={() => setFormOpen(false)}
+            />
+         </>
+      )}
     </div>
   );
 }

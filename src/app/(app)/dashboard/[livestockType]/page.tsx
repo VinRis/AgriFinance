@@ -2,48 +2,71 @@
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { useAppContext } from '@/contexts/app-context';
-import { LivestockType } from '@/lib/types';
+import { LivestockType, AgriTransaction } from '@/lib/types';
 import { DollarSign, TrendingUp, TrendingDown, BookOpen } from 'lucide-react';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
-function kpiReducer(
-  acc: {
-    totalRevenue: number;
-    totalExpenses: number;
-  },
-  record: any
-) {
-  acc.totalRevenue += record.revenue;
-  acc.totalExpenses += record.expenses;
-  return acc;
+interface AggregatedData {
+  totalRevenue: number;
+  totalExpenses: number;
+  netProfit: number;
+  totalTransactions: number;
+  chartData: { date: string; revenue: number; expenses: number }[];
 }
+
+function aggregateData(transactions: AgriTransaction[]): AggregatedData {
+    const dailyData: { [key: string]: { revenue: number; expenses: number } } = {};
+
+    transactions.forEach(t => {
+        const date = new Date(t.date).toISOString().split('T')[0];
+        if (!dailyData[date]) {
+            dailyData[date] = { revenue: 0, expenses: 0 };
+        }
+        if (t.transactionType === 'income') {
+            dailyData[date].revenue += t.amount;
+        } else {
+            dailyData[date].expenses += t.amount;
+        }
+    });
+
+    const chartData = Object.entries(dailyData)
+        .map(([date, data]) => ({
+            date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            ...data
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .slice(-30);
+
+    const { totalRevenue, totalExpenses } = transactions.reduce(
+        (acc, t) => {
+            if (t.transactionType === 'income') acc.totalRevenue += t.amount;
+            else acc.totalExpenses += t.amount;
+            return acc;
+        },
+        { totalRevenue: 0, totalExpenses: 0 }
+    );
+
+    return {
+        totalRevenue,
+        totalExpenses,
+        netProfit: totalRevenue - totalExpenses,
+        totalTransactions: transactions.length,
+        chartData
+    };
+}
+
 
 export default function DashboardPage({ params }: { params: { livestockType: string } }) {
   const { livestockType } = params;
-  const { getRecords, settings } = useAppContext();
+  const { getTransactions, settings } = useAppContext();
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
     notFound();
   }
 
-  const records = getRecords(livestockType as LivestockType);
-
-  const { totalRevenue, totalExpenses } = records.reduce(kpiReducer, {
-    totalRevenue: 0,
-    totalExpenses: 0,
-  });
-
-  const netProfit = totalRevenue - totalExpenses;
-
-  const chartData = records
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .map(r => ({
-      date: new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      revenue: r.revenue,
-      expenses: r.expenses,
-    })).slice(-30); // Last 30 records
-
-
+  const transactions = getTransactions(livestockType as LivestockType);
+  const { totalRevenue, totalExpenses, netProfit, totalTransactions, chartData } = aggregateData(transactions);
+  
   const KPICard = ({ title, value, icon: Icon, description }: { title: string; value: string; icon: React.ElementType, description: string }) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -79,26 +102,34 @@ export default function DashboardPage({ params }: { params: { livestockType: str
                 description="Profit after expenses."
             />
             <KPICard
-                title="Records"
-                value={records.length.toString()}
+                title="Transactions"
+                value={totalTransactions.toString()}
                 icon={BookOpen}
                 description="Total number of entries."
             />
        </div>
        <Card>
            <CardHeader>
-               <CardTitle>Revenue & Expenses Overview</CardTitle>
-               <CardDescription>A summary of the last 30 entries.</CardDescription>
+               <CardTitle>Financial Overview</CardTitle>
+               <CardDescription>A summary of income and expenses from the last 30 days.</CardDescription>
            </CardHeader>
            <CardContent>
                <ResponsiveContainer width="100%" height={300}>
                    <BarChart data={chartData}>
-                       <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                       <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${settings.currency}${value}`} />
+                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                       <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${settings.currency}${value}`} />
                        <Tooltip
                           contentStyle={{
                             backgroundColor: 'hsl(var(--background))',
-                            borderColor: 'hsl(var(--border))'
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)'
+                          }}
+                          labelStyle={{
+                            color:'hsl(var(--foreground))'
+                          }}
+                          itemStyle={{
+                            fontWeight: 'bold'
                           }}
                        />
                        <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Revenue" />
