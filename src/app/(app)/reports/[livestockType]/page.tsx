@@ -45,7 +45,7 @@ export default function ReportsPage({ params }: { params: { livestockType: strin
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
-        <Card>
+        <Card className="no-print">
           <CardHeader>
             <CardTitle>{title}</CardTitle>
              <CardDescription>
@@ -84,13 +84,4 @@ export default function ReportsPage({ params }: { params: { livestockType: strin
         </div>
     </div>
   );
-}
-
-@media print {
-  .print-only {
-    display: block;
-  }
-  .no-print {
-    display: none;
-  }
 }
