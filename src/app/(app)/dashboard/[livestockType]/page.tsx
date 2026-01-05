@@ -261,8 +261,8 @@ export default function DashboardPage() {
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
         <div className="flex justify-between items-center">
             <div>
-                <h2 className="text-2xl font-bold tracking-tight">Hello, {isHydrated ? settings.managerName.split(' ')[0] : '...'}!</h2>
-                <p className="text-muted-foreground">Here's your financial overview.</p>
+                <h2 className="text-xl font-bold tracking-tight">Hello, {isHydrated ? settings.managerName.split(' ')[0] : '...'}!</h2>
+                <p className="text-sm text-muted-foreground">Here's your financial overview.</p>
             </div>
             <Popover>
                 <PopoverTrigger asChild>
