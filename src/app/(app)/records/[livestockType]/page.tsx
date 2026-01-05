@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { notFound, usePathname } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
 import { LivestockType, AgriTransaction } from '@/lib/types';
@@ -44,6 +44,38 @@ export default function RecordsPage() {
     setSelectedTransaction(null);
   }
 
+  const Actions = ({transaction}: {transaction: AgriTransaction}) => (
+    <>
+      <Button variant="ghost" size="icon" onClick={() => handleEdit(transaction)}>
+        <Edit className="h-4 w-4" />
+      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the transaction.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleDelete(transaction.id)}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
         <Card>
@@ -57,59 +89,65 @@ export default function RecordsPage() {
           </CardHeader>
           <CardContent>
             {transactions.length > 0 ? (
-                 <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {transactions.map(t => (
-                            <TableRow key={t.id}>
-                                <TableCell>{new Date(t.date).toLocaleDateString()}</TableCell>
-                                <TableCell className="font-medium">{t.description}</TableCell>
-                                <TableCell><Badge variant="outline">{t.category}</Badge></TableCell>
-                                <TableCell className={`text-right font-semibold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {t.transactionType === 'income' ? '+' : '-'}
-                                    {settings.currency} {t.amount.toFixed(2)}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(t)}>
-                                        <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                This action cannot be undone. This will permanently delete the transaction.
-                                            </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction
-                                                onClick={() => handleDelete(t.id)}
-                                                className="bg-destructive hover:bg-destructive/90"
-                                            >
-                                                Delete
-                                            </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </TableCell>
+                <>
+                  {/* Mobile View */}
+                  <div className="md:hidden">
+                    <div className="space-y-4">
+                      {transactions.map(t => (
+                        <Card key={t.id} className="w-full">
+                          <CardHeader>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <CardTitle className="text-lg">{t.description || "Transaction"}</CardTitle>
+                                <CardDescription>{new Date(t.date).toLocaleDateString()}</CardDescription>
+                              </div>
+                              <div className={`text-lg font-bold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                {t.transactionType === 'income' ? '+' : '-'}
+                                {settings.currency}{t.amount.toFixed(2)}
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <Badge variant="outline">{t.category}</Badge>
+                          </CardContent>
+                          <CardFooter className="flex justify-end">
+                            <Actions transaction={t} />
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Desktop View */}
+                  <div className="hidden md:block">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Category</TableHead>
+                                <TableHead className="text-right">Amount</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                 </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {transactions.map(t => (
+                                <TableRow key={t.id}>
+                                    <TableCell>{new Date(t.date).toLocaleDateString()}</TableCell>
+                                    <TableCell className="font-medium">{t.description}</TableCell>
+                                    <TableCell><Badge variant="outline">{t.category}</Badge></TableCell>
+                                    <TableCell className={`text-right font-semibold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                        {t.transactionType === 'income' ? '+' : '-'}
+                                        {settings.currency} {t.amount.toFixed(2)}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                       <Actions transaction={t} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                  </div>
+                </>
             ) : (
                 <div className="text-center py-12">
                     <p className="text-muted-foreground">No transactions found.</p>
