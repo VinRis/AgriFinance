@@ -6,7 +6,7 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 
 export function Header() {
     const pathname = usePathname();
-    const { settings } = useAppContext();
+    const { settings, isHydrated } = useAppContext();
     const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
     const segments = pathname.split('/');
     let livestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
@@ -32,7 +32,7 @@ export function Header() {
             <div className="flex items-center gap-2">
                 <EnterpriseIcon className="h-6 w-6 text-primary" />
                 <h1 className="text-lg font-semibold md:text-xl">
-                    {settings.farmName} {pathname.includes('settings') ? '' : `- ${enterpriseName}`}
+                    {isHydrated ? settings.farmName : '...'} {pathname.includes('settings') ? '' : `- ${enterpriseName}`}
                 </h1>
             </div>
             {title && <div className="hidden md:block ml-auto text-lg font-semibold">{title}</div>}

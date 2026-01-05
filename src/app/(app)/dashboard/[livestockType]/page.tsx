@@ -5,7 +5,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, AgriTransaction } from '@/lib/types';
 import { DollarSign, TrendingUp, TrendingDown, BookOpen, Lightbulb } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Pie, PieChart, Cell, Legend } from 'recharts';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AggregatedData {
@@ -91,7 +91,7 @@ export default function DashboardPage() {
   const segments = pathname.split('/');
   const livestockType = segments[segments.length - 1] as LivestockType;
   
-  const { getTransactions, settings } = useAppContext();
+  const { getTransactions, settings, isHydrated } = useAppContext();
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
     notFound();
@@ -109,8 +109,17 @@ export default function DashboardPage() {
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        {isHydrated ? (
+          <>
+            <div className="text-2xl font-bold">{value}</div>
+            <p className="text-xs text-muted-foreground">{description}</p>
+          </>
+        ) : (
+          <>
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-full mt-1" />
+          </>
+        )}
       </CardContent>
     </Card>
   );
@@ -160,6 +169,7 @@ export default function DashboardPage() {
                   <CardDescription>A summary of income and expenses from the last 30 days.</CardDescription>
               </CardHeader>
               <CardContent>
+                  {isHydrated ? (
                   <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={barChartData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -182,6 +192,7 @@ export default function DashboardPage() {
                           <Bar dataKey="expenses" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} name="Expenses" />
                       </BarChart>
                   </ResponsiveContainer>
+                  ) : <Skeleton className="w-full h-[300px]" />}
               </CardContent>
           </Card>
           <Card className="lg:col-span-3">
@@ -190,7 +201,7 @@ export default function DashboardPage() {
               <CardDescription>A breakdown of expenses by category.</CardDescription>
             </CardHeader>
             <CardContent>
-              {pieChartData.length > 0 ? (
+              {isHydrated && pieChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
@@ -228,11 +239,11 @@ export default function DashboardPage() {
                     <Legend iconSize={10} />
                   </PieChart>
                 </ResponsiveContainer>
-              ) : (
+              ) : isHydrated ? (
                 <div className="flex items-center justify-center h-[300px] text-muted-foreground">
                   No expense data available.
                 </div>
-              )}
+              ) : <Skeleton className="w-full h-[300px]" />}
             </CardContent>
           </Card>
        </div>
@@ -245,7 +256,9 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
+            {isHydrated ? (
               <p className="text-sm text-foreground/90 whitespace-pre-line">{financialSummary}</p>
+            ) : <Skeleton className="h-16 w-full" />}
           </CardContent>
         </Card>
     </div>
