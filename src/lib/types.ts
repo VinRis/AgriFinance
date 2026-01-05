@@ -17,3 +17,14 @@ export interface AppSettings {
   location: string;
   currency: string;
 }
+
+export type TaskStatus = 'pending' | 'completed';
+
+export interface FarmTask {
+  id: string;
+  title: string;
+  date: string; // ISO string
+  livestockType: LivestockType | 'general';
+  description: string;
+  status: TaskStatus;
+}

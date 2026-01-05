@@ -1,24 +1,29 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, ReactNode, useEffect, useMemo, useState } from 'react';
-import { AgriTransaction, AppSettings, LivestockType } from '@/lib/types';
+import { AgriTransaction, AppSettings, FarmTask, LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 type State = {
   transactions: AgriTransaction[];
   settings: AppSettings;
+  tasks: FarmTask[];
 };
 
 type Action =
   | { type: 'ADD_TRANSACTION'; payload: AgriTransaction }
   | { type: 'UPDATE_TRANSACTION'; payload: AgriTransaction }
   | { type: 'DELETE_TRANSACTION'; payload: string }
+  | { type: 'ADD_TASK'; payload: FarmTask }
+  | { type: 'UPDATE_TASK'; payload: FarmTask }
+  | { type: 'DELETE_TASK'; payload: string }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<AppSettings> }
-  | { type: 'SET_STATE'; payload: State };
+  | { type: 'SET_STATE'; payload: Partial<State> };
 
 type AppContextType = State & {
   dispatch: React.Dispatch<Action>;
   getTransactions: (type: LivestockType) => AgriTransaction[];
+  getTasks: (type?: LivestockType | 'general') => FarmTask[];
   isHydrated: boolean;
 };
 
@@ -34,6 +39,7 @@ const defaultSettings: AppSettings = {
 const defaultState: State = {
     transactions: [],
     settings: defaultSettings,
+    tasks: [],
 };
 
 function appReducer(state: State, action: Action): State {
@@ -42,6 +48,7 @@ function appReducer(state: State, action: Action): State {
         return {
           settings: { ...defaultSettings, ...(action.payload.settings || {}) },
           transactions: action.payload.transactions || [],
+          tasks: action.payload.tasks || [],
         };
     case 'ADD_TRANSACTION':
       return { ...state, transactions: [...state.transactions, action.payload] };
@@ -52,6 +59,15 @@ function appReducer(state: State, action: Action): State {
       };
     case 'DELETE_TRANSACTION':
       return { ...state, transactions: state.transactions.filter((t) => t.id !== action.payload) };
+    case 'ADD_TASK':
+      return { ...state, tasks: [...state.tasks, action.payload] };
+    case 'UPDATE_TASK':
+       return {
+        ...state,
+        tasks: state.tasks.map((t) => (t.id === action.payload.id ? action.payload : t)),
+      };
+    case 'DELETE_TASK':
+      return { ...state, tasks: state.tasks.filter((t) => t.id !== action.payload) };
     case 'UPDATE_SETTINGS':
       return { ...state, settings: { ...state.settings, ...action.payload } };
     default:
@@ -72,7 +88,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     // Sync state from local storage once on initial load
     const transactions = storedState.transactions || [];
     const settings = { ...defaultSettings, ...(storedState.settings || {}) };
-    dispatch({ type: 'SET_STATE', payload: { transactions, settings } });
+    const tasks = storedState.tasks || [];
+    dispatch({ type: 'SET_STATE', payload: { transactions, settings, tasks } });
   }, []); // Empty dependency array ensures this runs only once on mount
 
   useEffect(() => {
@@ -86,11 +103,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (!isHydrated) return [];
     return state.transactions.filter(transaction => transaction.livestockType === type);
   };
+  
+  const getTasks = (type?: LivestockType | 'general') => {
+    if (!isHydrated) return [];
+    if (!type) return state.tasks;
+    return state.tasks.filter(task => task.livestockType === type);
+  };
 
   const contextValue = useMemo(() => ({
     ...state,
     dispatch,
     getTransactions,
+    getTasks,
     isHydrated
   }), [state, isHydrated]);
 

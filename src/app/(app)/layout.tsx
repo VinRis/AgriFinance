@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { RecordForm } from './records/[livestockType]/record-form';
+import { TaskForm } from './tasks/task-form';
 import { LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
@@ -22,6 +23,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setFormOpen(true);
   };
 
+  const isRecordsPage = pathname.includes('/records');
+  const isTasksPage = pathname.includes('/tasks');
+
+  const renderForm = () => {
+    if (isTasksPage) {
+        return <TaskForm isOpen={isFormOpen} onClose={() => setFormOpen(false)} />
+    }
+    if (isRecordsPage) {
+        return <RecordForm livestockType={livestockType} isOpen={isFormOpen} onClose={() => setFormOpen(false)} />
+    }
+    return null;
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Header />
@@ -31,7 +45,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
       <NavLinks />
-      {pathname !== '/' && (
+      {(isRecordsPage || isTasksPage) && (
          <>
             <Button
               onClick={handleFabClick}
@@ -39,13 +53,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               size="icon"
             >
               <Plus className="h-8 w-8" />
-              <span className="sr-only">Add Record</span>
+              <span className="sr-only">Add New</span>
             </Button>
-            <RecordForm 
-                livestockType={livestockType}
-                isOpen={isFormOpen}
-                onClose={() => setFormOpen(false)}
-            />
+            {renderForm()}
          </>
       )}
     </div>

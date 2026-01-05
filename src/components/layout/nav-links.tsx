@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BookCopy, FileText, LayoutDashboard, Settings, Home } from 'lucide-react';
+import { BookCopy, FileText, LayoutDashboard, Settings, Home, CalendarCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useEffect } from 'react';
@@ -36,6 +36,11 @@ export function NavLinks() {
       label: 'Records',
     },
     {
+      href: `/tasks`,
+      icon: CalendarCheck,
+      label: 'Tasks',
+    },
+    {
       href: `/reports/${livestockType}`,
       icon: FileText,
       label: 'Reports',
@@ -52,6 +57,7 @@ export function NavLinks() {
     if (href.includes('records')) return pathname.includes('records');
     if (href.includes('reports')) return pathname.includes('reports');
     if (href.includes('settings')) return pathname.includes('settings');
+    if (href.includes('tasks')) return pathname.includes('tasks');
     return pathname === href;
   };
   
@@ -59,7 +65,7 @@ export function NavLinks() {
     <>
       {/* Mobile Bottom Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background p-2 no-print">
-        <div className="mx-auto grid max-w-2xl grid-cols-5 items-center justify-items-center gap-2">
+        <div className="mx-auto grid max-w-2xl grid-cols-6 items-center justify-items-center gap-2">
             <Link
                 href="/"
                 className='flex flex-col items-center justify-center text-muted-foreground'
@@ -73,7 +79,9 @@ export function NavLinks() {
               key={item.label}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground',
-                isNavItemActive(item.href) ? 'text-primary' : ''
+                 isNavItemActive(item.href) ? 'text-primary' : '',
+                 (item.label === 'Dashboard' || item.label === 'Records' || item.label === 'Reports') &&
+                 pathname.includes('tasks') ? 'hidden sm:flex' : 'flex'
               )}
             >
               <item.icon className="h-6 w-6" />

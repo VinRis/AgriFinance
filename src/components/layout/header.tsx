@@ -1,7 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import { useAppContext } from '@/contexts/app-context';
-import { Bird, Milk, SettingsIcon } from 'lucide-react';
+import { Bird, Milk, SettingsIcon, CalendarCheck } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 export function Header() {
@@ -9,9 +9,9 @@ export function Header() {
     const { settings, isHydrated } = useAppContext();
     const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
     const segments = pathname.split('/');
-    let livestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
+    let livestockType: string | null = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
     
-    if (pathname.includes('/settings')) {
+    if (pathname.includes('/settings') || pathname.includes('/tasks')) {
         livestockType = lastSelectedType;
     }
 
@@ -20,19 +20,34 @@ export function Header() {
     else if(pathname.includes('records')) title = 'Records';
     else if(pathname.includes('reports')) title = 'Reports';
     else if(pathname.includes('settings')) title = 'Settings';
+    else if(pathname.includes('tasks')) title = 'Task Scheduler';
 
 
-    if (!livestockType && !pathname.includes('settings')) return null;
+    if (!livestockType && !pathname.includes('settings') && !pathname.includes('tasks')) return null;
 
-    const EnterpriseIcon = livestockType === 'dairy' ? Milk : livestockType === 'poultry' ? Bird : SettingsIcon;
-    const enterpriseName = livestockType === 'dairy' ? 'Dairy' : livestockType === 'poultry' ? 'Poultry' : 'General';
+    const getIcon = () => {
+      if (pathname.includes('/tasks')) return CalendarCheck;
+      if (pathname.includes('/settings')) return SettingsIcon;
+      if (livestockType === 'dairy') return Milk;
+      if (livestockType === 'poultry') return Bird;
+      return SettingsIcon;
+    }
+
+    const EnterpriseIcon = getIcon();
+
+    const getEnterpriseName = () => {
+        if(pathname.includes('/tasks')) return null;
+        if(pathname.includes('/settings')) return null;
+        return livestockType === 'dairy' ? 'Dairy' : 'Poultry';
+    }
+    const enterpriseName = getEnterpriseName();
 
     return (
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 no-print">
             <div className="flex items-center gap-2">
                 <EnterpriseIcon className="h-6 w-6 text-primary" />
                 <h1 className="text-lg font-semibold md:text-xl">
-                    {isHydrated ? settings.farmName : '...'} {pathname.includes('settings') ? '' : `- ${enterpriseName}`}
+                    {isHydrated ? settings.farmName : '...'} {enterpriseName && `- ${enterpriseName}`}
                 </h1>
             </div>
             {title && <div className="hidden md:block ml-auto text-lg font-semibold">{title}</div>}
