@@ -76,8 +76,17 @@
   .no-print {
     display: none !important;
   }
+  .print-only {
+    display: block !important;
+  }
   main {
     padding: 0 !important;
     margin: 0 !important;
   }
+}
+
+@layer utilities {
+    .print-only {
+        display: none;
+    }
 }
