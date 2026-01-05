@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { LivestockType } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
-import { Download, Printer } from 'lucide-react';
+import { Download, Printer, TrendingUp, TrendingDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMemo, useState } from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Pie, PieChart, Cell } from 'recharts';
@@ -188,8 +188,8 @@ export default function ReportsPage() {
 
   return (
     <>
-      <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3 mb-20">
-        <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
+      <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 mb-20">
+        <div className="grid auto-rows-max items-start gap-4 md:gap-8">
           <Card className="no-print w-full">
             <CardHeader>
               <CardTitle>{title}</CardTitle>
@@ -216,9 +216,9 @@ export default function ReportsPage() {
               <CardHeader>
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div>
-                          <CardTitle>Profit & Loss Statement</CardTitle>
+                          <CardTitle>Profit &amp; Loss Statement</CardTitle>
                           <CardDescription>
-                              Yearly financial performance by month for {selectedYear}.
+                              Yearly financial performance summary for {selectedYear}.
                           </CardDescription>
                       </div>
                       <div className="flex items-center gap-2 self-start sm:self-center w-full sm:w-auto">
@@ -232,46 +232,31 @@ export default function ReportsPage() {
                           </Select>
                           <Button onClick={generatePnLCSV} variant="outline" size="icon" disabled={pnlData.monthlyData.every(d => d.income === 0 && d.expenses === 0)}>
                               <Download className="h-4 w-4" />
-                              <span className="sr-only">Export P&L</span>
+                              <span className="sr-only">Export P&amp;L</span>
                           </Button>
                       </div>
                   </div>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto rounded-lg border">
-                  <table className="w-full text-sm">
-                      <thead className="bg-muted/50">
-                          <tr className="text-left">
-                              <th className="p-3 font-medium">Month</th>
-                              <th className="p-3 font-medium text-right">Income</th>
-                              <th className="p-3 font-medium text-right">Expenses</th>
-                              <th className="p-3 font-medium text-right">Net Profit</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {pnlData.monthlyData.map((data, index) => (
-                            <tr key={data.month} className="border-b last:border-none">
-                                <td className="p-3 font-medium">{data.month}</td>
-                                <td className="p-3 text-right text-green-600">{formatCurrency(data.income, settings.currency)}</td>
-                                <td className="p-3 text-right text-red-600">{formatCurrency(data.expenses, settings.currency)}</td>
-                                <td className={`p-3 text-right font-semibold ${data.netProfit >= 0 ? 'text-foreground' : 'text-destructive'}`}>
-                                  {formatCurrency(data.netProfit, settings.currency)}
-                                </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                      <tfoot className="bg-muted/50 font-bold">
-                          <tr>
-                              <td className="p-3">Annual Total</td>
-                              <td className="p-3 text-right text-green-600">{formatCurrency(pnlData.annualTotals.income, settings.currency)}</td>
-                              <td className="p-3 text-right text-red-600">{formatCurrency(pnlData.annualTotals.expenses, settings.currency)}</td>
-                              <td className={`p-3 text-right font-semibold ${pnlData.annualTotals.netProfit >= 0 ? 'text-foreground' : 'text-destructive'}`}>
-                                  {formatCurrency(pnlData.annualTotals.netProfit, settings.currency)}
-                              </td>
-                          </tr>
-                      </tfoot>
-                  </table>
+                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                    <div className="rounded-lg border bg-card text-card-foreground p-4">
+                        <p className="text-sm font-medium text-muted-foreground">Total Income</p>
+                        <p className="text-2xl font-bold text-green-600">{formatCurrency(pnlData.annualTotals.income, settings.currency)}</p>
+                    </div>
+                     <div className="rounded-lg border bg-card text-card-foreground p-4">
+                        <p className="text-sm font-medium text-muted-foreground">Total Expenses</p>
+                        <p className="text-2xl font-bold text-red-600">{formatCurrency(pnlData.annualTotals.expenses, settings.currency)}</p>
+                    </div>
+                    <div className="rounded-lg border bg-card text-card-foreground p-4">
+                        <p className="text-sm font-medium text-muted-foreground">Net Profit</p>
+                        <p className={`text-2xl font-bold ${pnlData.annualTotals.netProfit >= 0 ? 'text-foreground' : 'text-destructive'}`}>
+                          {formatCurrency(pnlData.annualTotals.netProfit, settings.currency)}
+                        </p>
+                    </div>
                 </div>
+                <p className="text-xs text-muted-foreground mt-4 text-center">
+                    The full monthly breakdown can be downloaded as a CSV file.
+                </p>
               </CardContent>
           </Card>
         </div>
@@ -338,9 +323,9 @@ export default function ReportsPage() {
               </footer>
           </div>
 
-          {/* Page 2: P&L Statement */}
+          {/* Page 2: P&amp;L Statement */}
           <div className="print-page">
-              <ReportHeader title={`Profit & Loss Statement`} year={selectedYear} />
+              <ReportHeader title={`Profit &amp; Loss Statement`} year={selectedYear} />
               <div className="p-4 sm:p-8">
                   <div className="overflow-x-auto rounded-lg border border-gray-200">
                       <table className="w-full text-sm">
@@ -386,3 +371,5 @@ export default function ReportsPage() {
     </>
   );
 }
+
+    
