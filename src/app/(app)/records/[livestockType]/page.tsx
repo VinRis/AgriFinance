@@ -15,6 +15,10 @@ import { startOfDay, endOfDay, isValid, parseISO } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+function formatCurrency(amount: number, currency: string) {
+    return `${currency} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export default function RecordsPage() {
   const pathname = usePathname();
   const segments = pathname.split('/');
@@ -198,7 +202,7 @@ export default function RecordsPage() {
                             <div className="text-right">
                                 <div className={`text-lg font-bold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                                     {t.transactionType === 'income' ? '+' : '-'}
-                                    {settings.currency}{t.amount.toFixed(2)}
+                                    {formatCurrency(t.amount, settings.currency)}
                                 </div>
                                 <div className="mt-2">
                                     <Actions transaction={t} />
@@ -229,7 +233,7 @@ export default function RecordsPage() {
                                     <TableCell><Badge variant="outline">{t.category}</Badge></TableCell>
                                     <TableCell className={`text-right font-semibold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                                         {t.transactionType === 'income' ? '+' : '-'}
-                                        {settings.currency} {t.amount.toFixed(2)}
+                                        {formatCurrency(t.amount, settings.currency)}
                                     </TableCell>
                                     <TableCell className="text-right">
                                        <Actions transaction={t} />
@@ -256,3 +260,5 @@ export default function RecordsPage() {
     </div>
   );
 }
+
+    

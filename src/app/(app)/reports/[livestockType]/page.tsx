@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { LivestockType, AgriTransaction } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
-import { Download, Printer, DollarSign, TrendingUp, TrendingDown, BookOpen } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMemo } from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Pie, PieChart, Cell } from 'recharts';
@@ -17,6 +17,11 @@ interface AggregatedData {
   incomeByCategory: { name: string; value: number }[];
   expensesByCategory: { name: string; value: number }[];
 }
+
+function formatCurrency(amount: number, currency: string) {
+    return `${currency}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 
 export default function ReportsPage() {
   const pathname = usePathname();
@@ -141,16 +146,16 @@ export default function ReportsPage() {
               <div className="grid grid-cols-3 gap-6 mb-8 text-center">
                 <div className="bg-gray-100 p-4 rounded-lg shadow">
                   <h3 className="text-sm font-medium text-gray-500">Total Revenue</h3>
-                  <p className="text-2xl font-bold text-green-600">{settings.currency}{aggregatedData.totalRevenue.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(aggregatedData.totalRevenue, settings.currency)}</p>
                 </div>
                  <div className="bg-gray-100 p-4 rounded-lg shadow">
                   <h3 className="text-sm font-medium text-gray-500">Total Expenses</h3>
-                  <p className="text-2xl font-bold text-red-600">{settings.currency}{aggregatedData.totalExpenses.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(aggregatedData.totalExpenses, settings.currency)}</p>
                 </div>
                  <div className="bg-gray-100 p-4 rounded-lg shadow">
                   <h3 className="text-sm font-medium text-gray-500">Net Profit</h3>
                   <p className={`text-2xl font-bold ${aggregatedData.netProfit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                    {settings.currency}{aggregatedData.netProfit.toFixed(2)}
+                    {formatCurrency(aggregatedData.netProfit, settings.currency)}
                   </p>
                 </div>
               </div>
@@ -162,8 +167,8 @@ export default function ReportsPage() {
                        <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={[{ name: 'Financials', revenue: aggregatedData.totalRevenue, expenses: aggregatedData.totalExpenses }]}>
                               <XAxis dataKey="name" stroke="#888" fontSize={12} />
-                              <YAxis stroke="#888" fontSize={12} tickFormatter={(v) => `${settings.currency}${v}`} />
-                              <Tooltip formatter={(v: number) => `${settings.currency}${v.toFixed(2)}`} />
+                              <YAxis stroke="#888" fontSize={12} tickFormatter={(v) => `${settings.currency}${v.toLocaleString('en-US')}`} />
+                              <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
                               <Legend />
                               <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
                               <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
@@ -179,7 +184,7 @@ export default function ReportsPage() {
                                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                   ))}
                               </Pie>
-                              <Tooltip formatter={(v: number) => `${settings.currency}${v.toFixed(2)}`} />
+                              <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
                               <Legend />
                           </PieChart>
                       </ResponsiveContainer>
@@ -207,7 +212,7 @@ export default function ReportsPage() {
                                       <td className="p-3 text-gray-700">{t.category}</td>
                                       <td className={`p-3 text-right font-semibold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                                           {t.transactionType === 'income' ? '+' : '-'}
-                                          {settings.currency}{t.amount.toFixed(2)}
+                                          {formatCurrency(t.amount, settings.currency)}
                                       </td>
                                   </tr>
                               ))}
@@ -231,3 +236,5 @@ export default function ReportsPage() {
     </div>
   );
 }
+
+    

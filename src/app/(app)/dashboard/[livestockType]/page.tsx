@@ -21,6 +21,10 @@ interface AggregatedData {
   pieChartData: { name: string; value: number }[];
 }
 
+function formatCurrency(amount: number, currency: string) {
+    return `${currency} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 function aggregateData(transactions: AgriTransaction[]): AggregatedData {
     const dailyData: { [key: string]: { revenue: number; expenses: number } } = {};
     const expenseCategories: { [key: string]: number } = {};
@@ -73,11 +77,11 @@ function generateFinancialSummary(data: AggregatedData, currency: string): strin
   }
 
   const { totalRevenue, totalExpenses, netProfit, pieChartData } = data;
-  let summary = `You've logged ${data.totalTransactions} transactions. Your total income is ${currency}${totalRevenue.toFixed(2)} and total expenses are ${currency}${totalExpenses.toFixed(2)}, resulting in a net profit of ${currency}${netProfit.toFixed(2)}. `;
+  let summary = `You've logged ${data.totalTransactions} transactions. Your total income is ${formatCurrency(totalRevenue, currency)} and total expenses are ${formatCurrency(totalExpenses, currency)}, resulting in a net profit of ${formatCurrency(netProfit, currency)}. `;
 
   if (pieChartData.length > 0) {
     const highestExpenseCategory = pieChartData.reduce((max, cat) => cat.value > max.value ? cat : max);
-    summary += `Your largest expense category is "${highestExpenseCategory.name}" at ${currency}${highestExpenseCategory.value.toFixed(2)}. `;
+    summary += `Your largest expense category is "${highestExpenseCategory.name}" at ${formatCurrency(highestExpenseCategory.value, currency)}. `;
   }
 
   if (netProfit > 0) {
@@ -265,25 +269,25 @@ export default function DashboardPage() {
        <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
             <KPICard
                 title="Total Revenue"
-                value={`${settings.currency} ${totalRevenue.toFixed(2)}`}
+                value={formatCurrency(totalRevenue, settings.currency)}
                 icon={DollarSign}
                 description="Total income from sales."
             />
              <KPICard
                 title="Total Expenses"
-                value={`${settings.currency} ${totalExpenses.toFixed(2)}`}
+                value={formatCurrency(totalExpenses, settings.currency)}
                 icon={DollarSign}
                 description="Total expenses incurred."
             />
             <KPICard
                 title="Net Profit"
-                value={`${settings.currency} ${netProfit.toFixed(2)}`}
+                value={formatCurrency(netProfit, settings.currency)}
                 icon={netProfit >= 0 ? TrendingUp : TrendingDown}
                 description="Profit after expenses."
             />
             <KPICard
                 title="Transactions"
-                value={totalTransactions.toString()}
+                value={totalTransactions.toLocaleString('en-US')}
                 icon={BookOpen}
                 description="Total number of entries."
             />
@@ -301,7 +305,7 @@ export default function DashboardPage() {
                       <BarChart data={barChartData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
                           <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                          <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${settings.currency}${value}`} />
+                          <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${settings.currency}${value.toLocaleString('en-US')}`} />
                           <Tooltip
                             cursor={{ fill: 'hsl(var(--muted))', radius: 'var(--radius)'}}
                             contentStyle={{
@@ -310,6 +314,7 @@ export default function DashboardPage() {
                               borderRadius: 'var(--radius)',
                               boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)'
                             }}
+                            formatter={(value: number) => formatCurrency(value, settings.currency)}
                           />
                           <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Revenue" />
                           <Bar dataKey="expenses" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} name="Expenses" />
@@ -363,7 +368,7 @@ export default function DashboardPage() {
                           borderRadius: 'var(--radius)',
                           boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)'
                         }}
-                        formatter={(value: number) => `${settings.currency} ${value.toFixed(2)}`}
+                        formatter={(value: number) => formatCurrency(value, settings.currency)}
                     />
                     <Legend iconSize={12} iconType="circle" />
                   </PieChart>
@@ -393,3 +398,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
