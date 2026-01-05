@@ -84,8 +84,8 @@
   body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    background-color: white;
-    color: black;
+    background-color: white !important;
+    color: black !important;
   }
   .no-print {
     display: none !important;
@@ -96,13 +96,30 @@
   .print-page {
     page-break-after: always;
     page-break-inside: avoid;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
-  .page-header {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
+   .page-header {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #e5e7eb;
+  }
+  .page-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
   }
   main {
     padding: 0 !important;
     margin: 0 !important;
+  }
+  html, body {
+    height: auto;
+    background: white !important;
   }
 }

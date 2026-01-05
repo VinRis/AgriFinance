@@ -59,11 +59,13 @@ export default function ReportsPage() {
   const transactions = getTransactions(livestockType);
 
   const aggregatedData: AggregatedData = useMemo(() => {
+    const yearlyTransactions = transactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
+
     const data: AggregatedData = {
       totalRevenue: 0,
       totalExpenses: 0,
       netProfit: 0,
-      totalTransactions: transactions.length,
+      totalTransactions: yearlyTransactions.length,
       incomeByCategory: [],
       expensesByCategory: []
     };
@@ -71,7 +73,7 @@ export default function ReportsPage() {
     const incomeMap: { [key: string]: number } = {};
     const expenseMap: { [key: string]: number } = {};
 
-    transactions.forEach(t => {
+    yearlyTransactions.forEach(t => {
       if (t.transactionType === 'income') {
         data.totalRevenue += t.amount;
         incomeMap[t.category] = (incomeMap[t.category] || 0) + t.amount;
@@ -86,7 +88,7 @@ export default function ReportsPage() {
     data.expensesByCategory = Object.entries(expenseMap).map(([name, value]) => ({ name, value }));
     
     return data;
-  }, [transactions]);
+  }, [transactions, selectedYear]);
   
   const pnlData: PnLData = useMemo(() => {
     const yearlyTransactions = transactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
@@ -139,7 +141,7 @@ export default function ReportsPage() {
   
   const generatePnLCSV = () => {
     const { monthlyData, annualTotals } = pnlData;
-    if (monthlyData.length === 0) {
+    if (monthlyData.every(d => d.income === 0 && d.expenses === 0)) {
       toast({
         variant: 'destructive',
         title: 'No Data to Export',
@@ -173,12 +175,13 @@ export default function ReportsPage() {
 
   const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
-  const ReportHeader = ({ title }: { title: string }) => (
-    <header className="text-center page-header">
+  const ReportHeader = ({ title, year }: { title: string, year: number }) => (
+    <header className="text-center page-header px-8">
         <h1 className="text-3xl font-bold text-gray-800">{settings.farmName}</h1>
         <p className="text-gray-600">{settings.location}</p>
         <p className="text-sm text-gray-500">Prepared by: {settings.managerName}</p>
         <h2 className="text-2xl font-semibold text-gray-700 mt-4">{title}</h2>
+        <p className="text-sm text-gray-500">For the Year Ended December 31, {year}</p>
         <p className="text-sm text-gray-500">Report Date: {new Date().toLocaleDateString()}</p>
     </header>
   );
@@ -193,31 +196,30 @@ export default function ReportsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>You can export all your data as a CSV file or print a professional summary of your records.</p>
+            <p>You can export all your transaction data as a CSV file or print a professional summary of your records.</p>
              <div className="mt-6 flex flex-col sm:flex-row gap-4">
                  <Button onClick={generateFullReportCSV} disabled={transactions.length === 0}>
-                    <Download className="mr-2" />
+                    <Download className="mr-2 h-4 w-4" />
                     Export All as CSV
                 </Button>
                 <Button onClick={handlePrint} variant="outline">
-                  <Printer className="mr-2" />
+                  <Printer className="mr-2 h-4 w-4" />
                   Print Financial Summary
                 </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="print-section no-print">
+        <Card className="no-print">
             <CardHeader>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <CardTitle>Profit & Loss Statement</CardTitle>
                         <CardDescription>
-                            Yearly financial performance by month.
+                            Yearly financial performance by month for {selectedYear}.
                         </CardDescription>
                     </div>
-                    <div className="flex items-center gap-2 no-print">
-                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 self-start sm:self-center">
                         <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Select Year" />
@@ -226,7 +228,7 @@ export default function ReportsPage() {
                                 {years.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                             </SelectContent>
                         </Select>
-                        <Button onClick={generatePnLCSV} variant="outline" size="icon" disabled={pnlData.monthlyData.length === 0}>
+                        <Button onClick={generatePnLCSV} variant="outline" size="icon" disabled={pnlData.monthlyData.every(d => d.income === 0 && d.expenses === 0)}>
                             <Download className="h-4 w-4" />
                             <span className="sr-only">Export P&L</span>
                         </Button>
@@ -275,7 +277,7 @@ export default function ReportsPage() {
         <div className="print-only">
             {/* Page 1: Financial Summary */}
             <div className="print-page">
-                <ReportHeader title="Financial Performance Summary" />
+                <ReportHeader title="Financial Performance Summary" year={selectedYear} />
                 <div className="p-8 space-y-8">
                     {/* KPIs */}
                     <div className="grid grid-cols-3 gap-6 text-center">
@@ -304,7 +306,7 @@ export default function ReportsPage() {
                                     <XAxis dataKey="name" stroke="#888" fontSize={12} />
                                     <YAxis stroke="#888" fontSize={12} tickFormatter={(v) => `${settings.currency}${v.toLocaleString('en-US')}`} />
                                     <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
-                                    <Legend />
+                                    <Legend wrapperStyle={{fontSize: "12px"}}/>
                                     <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
                                     <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
                                 </BarChart>
@@ -314,23 +316,27 @@ export default function ReportsPage() {
                             <h3 className="text-lg font-semibold text-gray-700 mb-2 text-center">Expense Breakdown</h3>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={aggregatedData.expensesByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                    <Pie data={aggregatedData.expensesByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                                         {aggregatedData.expensesByCategory.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
                                     <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
-                                    <Legend />
+                                    <Legend wrapperStyle={{fontSize: "10px", bottom: -10}}/>
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
+                 <footer className="page-footer">
+                    <p>&copy; {new Date().getFullYear()} {settings.farmName}. All rights reserved.</p>
+                    <p>Agri Finance - Financial Management Simplified</p>
+                </footer>
             </div>
 
             {/* Page 2: P&L Statement */}
             <div className="print-page">
-                <ReportHeader title={`Profit & Loss Statement for ${selectedYear}`} />
+                <ReportHeader title={`Profit & Loss Statement`} year={selectedYear} />
                 <div className="p-8">
                     <div className="overflow-x-auto rounded-lg border border-gray-200">
                         <table className="w-full text-sm">
@@ -367,12 +373,11 @@ export default function ReportsPage() {
                         </table>
                     </div>
                 </div>
+                 <footer className="page-footer">
+                    <p>&copy; {new Date().getFullYear()} {settings.farmName}. All rights reserved.</p>
+                    <p>Agri Finance - Financial Management Simplified</p>
+                </footer>
             </div>
-
-            <footer className="print-only text-center text-xs text-gray-400 border-t pt-4">
-                <p>&copy; {new Date().getFullYear()} {settings.farmName}. All rights reserved.</p>
-                <p>Agri Finance - Financial Management Simplified</p>
-            </footer>
         </div>
     </div>
   );
