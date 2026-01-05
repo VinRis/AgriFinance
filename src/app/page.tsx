@@ -144,7 +144,7 @@ export default function LivestockSelectionPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 w-full p-6">
                   <h2 className="font-headline text-3xl font-bold text-white">{option.type}</h2>
-                  <p className="mt-1 text-primary-foreground/90">{option.description}</p>
+                  <p className="mt-1 text-white/90">{option.description}</p>
                   <div className="mt-4 flex items-center text-accent">
                     <span className="font-semibold">Get Started</span>
                     <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />
