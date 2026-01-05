@@ -176,13 +176,13 @@ export default function ReportsPage() {
   const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
   const ReportHeader = ({ title, year }: { title: string, year: number }) => (
-    <header className="text-center page-header px-8">
-        <h1 className="text-3xl font-bold text-gray-800">{settings.farmName}</h1>
-        <p className="text-gray-600">{settings.location}</p>
-        <p className="text-sm text-gray-500">Prepared by: {settings.managerName}</p>
-        <h2 className="text-2xl font-semibold text-gray-700 mt-4">{title}</h2>
-        <p className="text-sm text-gray-500">For the Year Ended December 31, {year}</p>
-        <p className="text-sm text-gray-500">Report Date: {new Date().toLocaleDateString()}</p>
+    <header className="text-center page-header px-4 sm:px-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{settings.farmName}</h1>
+        <p className="text-sm sm:text-base text-gray-600">{settings.location}</p>
+        <p className="text-xs sm:text-sm text-gray-500">Prepared by: {settings.managerName}</p>
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mt-4">{title}</h2>
+        <p className="text-xs sm:text-sm text-gray-500">For the Year Ended December 31, {year}</p>
+        <p className="text-xs sm:text-sm text-gray-500">Report Date: {new Date().toLocaleDateString()}</p>
     </header>
   );
 
@@ -221,7 +221,7 @@ export default function ReportsPage() {
                     </div>
                     <div className="flex items-center gap-2 self-start sm:self-center">
                         <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="w-full sm:w-[180px]">
                                 <SelectValue placeholder="Select Year" />
                             </SelectTrigger>
                             <SelectContent>
@@ -278,51 +278,51 @@ export default function ReportsPage() {
             {/* Page 1: Financial Summary */}
             <div className="print-page">
                 <ReportHeader title="Financial Performance Summary" year={selectedYear} />
-                <div className="p-8 space-y-8">
+                <div className="p-4 sm:p-8 space-y-8">
                     {/* KPIs */}
-                    <div className="grid grid-cols-3 gap-6 text-center">
-                        <div className="bg-gray-100 p-4 rounded-lg shadow">
-                            <h3 className="text-sm font-medium text-gray-500">Total Revenue</h3>
-                            <p className="text-2xl font-bold text-green-600">{formatCurrency(aggregatedData.totalRevenue, settings.currency)}</p>
+                    <div className="grid grid-cols-3 gap-2 sm:gap-6 text-center">
+                        <div className="bg-gray-100 p-2 sm:p-4 rounded-lg shadow">
+                            <h3 className="text-xs sm:text-sm font-medium text-gray-500">Total Revenue</h3>
+                            <p className="text-base sm:text-2xl font-bold text-green-600">{formatCurrency(aggregatedData.totalRevenue, settings.currency)}</p>
                         </div>
-                        <div className="bg-gray-100 p-4 rounded-lg shadow">
-                            <h3 className="text-sm font-medium text-gray-500">Total Expenses</h3>
-                            <p className="text-2xl font-bold text-red-600">{formatCurrency(aggregatedData.totalExpenses, settings.currency)}</p>
+                        <div className="bg-gray-100 p-2 sm:p-4 rounded-lg shadow">
+                            <h3 className="text-xs sm:text-sm font-medium text-gray-500">Total Expenses</h3>
+                            <p className="text-base sm:text-2xl font-bold text-red-600">{formatCurrency(aggregatedData.totalExpenses, settings.currency)}</p>
                         </div>
-                        <div className="bg-gray-100 p-4 rounded-lg shadow">
-                            <h3 className="text-sm font-medium text-gray-500">Net Profit</h3>
-                            <p className={`text-2xl font-bold ${aggregatedData.netProfit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                        <div className="bg-gray-100 p-2 sm:p-4 rounded-lg shadow">
+                            <h3 className="text-xs sm:text-sm font-medium text-gray-500">Net Profit</h3>
+                            <p className={`text-base sm:text-2xl font-bold ${aggregatedData.netProfit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
                                 {formatCurrency(aggregatedData.netProfit, settings.currency)}
                             </p>
                         </div>
                     </div>
                     
                     {/* Charts */}
-                    <div className="grid grid-cols-2 gap-8" style={{height: '300px'}}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8" style={{height: '300px'}}>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-700 mb-2 text-center">Income vs. Expenses</h3>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2 text-center">Income vs. Expenses</h3>
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={[{ name: 'Financials', revenue: aggregatedData.totalRevenue, expenses: aggregatedData.totalExpenses }]}>
-                                    <XAxis dataKey="name" stroke="#888" fontSize={12} />
-                                    <YAxis stroke="#888" fontSize={12} tickFormatter={(v) => `${settings.currency}${v.toLocaleString('en-US')}`} />
+                                    <XAxis dataKey="name" stroke="#888" fontSize={10} />
+                                    <YAxis stroke="#888" fontSize={10} tickFormatter={(v) => `${settings.currency}${v.toLocaleString('en-US')}`} />
                                     <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
-                                    <Legend wrapperStyle={{fontSize: "12px"}}/>
+                                    <Legend wrapperStyle={{fontSize: "10px"}}/>
                                     <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
                                     <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-700 mb-2 text-center">Expense Breakdown</h3>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2 text-center">Expense Breakdown</h3>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={aggregatedData.expensesByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                    <Pie data={aggregatedData.expensesByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                                         {aggregatedData.expensesByCategory.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
                                     <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
-                                    <Legend wrapperStyle={{fontSize: "10px", bottom: -10}}/>
+                                    <Legend wrapperStyle={{fontSize: "10px", bottom: -5}}/>
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
@@ -337,7 +337,7 @@ export default function ReportsPage() {
             {/* Page 2: P&L Statement */}
             <div className="print-page">
                 <ReportHeader title={`Profit & Loss Statement`} year={selectedYear} />
-                <div className="p-8">
+                <div className="p-4 sm:p-8">
                     <div className="overflow-x-auto rounded-lg border border-gray-200">
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50">
