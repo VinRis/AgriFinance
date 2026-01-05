@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect, useMemo } from 'react';
 import { AgriTransaction, AppSettings, LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
@@ -13,7 +13,8 @@ type Action =
   | { type: 'ADD_TRANSACTION'; payload: AgriTransaction }
   | { type: 'UPDATE_TRANSACTION'; payload: AgriTransaction }
   | { type: 'DELETE_TRANSACTION'; payload: string }
-  | { type: 'UPDATE_SETTINGS'; payload: Partial<AppSettings> };
+  | { type: 'UPDATE_SETTINGS'; payload: Partial<AppSettings> }
+  | { type: 'SET_STATE'; payload: State };
 
 type AppContextType = State & {
   dispatch: React.Dispatch<Action>;
@@ -29,8 +30,15 @@ const defaultSettings: AppSettings = {
   currency: 'USD',
 };
 
+const defaultState: State = {
+    transactions: [],
+    settings: defaultSettings,
+};
+
 function appReducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'SET_STATE':
+        return action.payload;
     case 'ADD_TRANSACTION':
       return { ...state, transactions: [...state.transactions, action.payload] };
     case 'UPDATE_TRANSACTION':
@@ -48,25 +56,25 @@ function appReducer(state: State, action: Action): State {
 }
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [storedState, setStoredState] = useLocalStorage<State>('agri-finance-pro-data', {
-    transactions: [],
-    settings: defaultSettings,
-  });
+  const [storedState, setStoredState] = useLocalStorage<State>('agri-finance-pro-data', defaultState);
 
-  const [state, dispatch] = useReducer(appReducer, storedState);
+  const initialState = useMemo(() => ({
+    transactions: storedState.transactions || [],
+    settings: { ...defaultSettings, ...storedState.settings },
+  }), [storedState]);
 
-  const enhancedDispatch: React.Dispatch<Action> = (action) => {
-    const newState = appReducer(state, action);
-    setStoredState(newState);
-    dispatch(action);
-  };
-  
+  const [state, dispatch] = useReducer(appReducer, initialState);
+
+  useEffect(() => {
+    setStoredState(state);
+  }, [state, setStoredState]);
+
   const getTransactions = (type: LivestockType) => {
     return state.transactions.filter(transaction => transaction.livestockType === type);
   };
 
   return (
-    <AppContext.Provider value={{ ...state, dispatch: enhancedDispatch, getTransactions }}>
+    <AppContext.Provider value={{ ...state, dispatch, getTransactions }}>
       {children}
     </AppContext.Provider>
   );
