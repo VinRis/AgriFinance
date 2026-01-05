@@ -9,37 +9,37 @@ import { TaskForm } from './task-form';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format, startOfToday } from 'date-fns';
 
 export default function TasksPage() {
   const { getTasks, dispatch } = useAppContext();
   const { toast } = useToast();
   const [isFormOpen, setFormOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<FarmTask | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>('upcoming');
   
   const allTasks = useMemo(() => getTasks(), [getTasks]);
 
-  const tasksForSelectedDate = useMemo(() => {
-    if (!selectedDate) return [];
-    return allTasks.filter(task => {
-        const taskDate = new Date(task.date);
-        const selDate = new Date(selectedDate);
-        return taskDate.getFullYear() === selDate.getFullYear() &&
-               taskDate.getMonth() === selDate.getMonth() &&
-               taskDate.getDate() === selDate.getDate();
-    }).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [allTasks, selectedDate]);
-
-  const upcomingTasks = useMemo(() => {
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      return allTasks.filter(task => new Date(task.date) >= today && task.status === 'pending')
-        .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .slice(0, 5);
+  const uniqueTaskDates = useMemo(() => {
+    const dates = allTasks.map(task => format(new Date(task.date), 'yyyy-MM-dd'));
+    return [...new Set(dates)].sort((a,b) => new Date(b).getTime() - new Date(a).getTime());
   }, [allTasks]);
+  
+  const filteredTasks = useMemo(() => {
+    const today = startOfToday();
+    if (selectedDateFilter === 'all') {
+      return allTasks.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    if (selectedDateFilter === 'upcoming') {
+       return allTasks.filter(task => new Date(task.date) >= today && task.status === 'pending')
+        .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }
+    return allTasks.filter(task => format(new Date(task.date), 'yyyy-MM-dd') === selectedDateFilter)
+        .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [allTasks, selectedDateFilter]);
 
 
   const handleEdit = (task: FarmTask) => {
@@ -70,6 +70,12 @@ export default function TasksPage() {
         default: return 'bg-gray-200 text-gray-800';
     }
   }
+  
+  const getFilterLabel = () => {
+    if (selectedDateFilter === 'upcoming') return 'Upcoming Tasks';
+    if (selectedDateFilter === 'all') return 'All Tasks';
+    return `Tasks for ${format(new Date(selectedDateFilter), 'PPP')}`;
+  }
 
   const TaskItem = ({ task }: { task: FarmTask }) => (
     <div className="flex items-center space-x-4 py-3 border-b last:border-b-0">
@@ -82,6 +88,7 @@ export default function TasksPage() {
         <Label htmlFor={`task-${task.id}`} className={`font-medium ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
           {task.title}
         </Label>
+        <p className="text-sm text-muted-foreground">{format(new Date(task.date), 'PPP')}</p>
         <p className="text-sm text-muted-foreground">{task.description}</p>
         <Badge variant="outline" className={`mt-1 text-xs ${getLivestockTypeColor(task.livestockType)}`}>{task.livestockType}</Badge>
       </div>
@@ -116,83 +123,43 @@ export default function TasksPage() {
       </div>
     </div>
   );
-  
-  const DayContent = (dayProps: { date: Date }) => {
-    const { date } = dayProps;
-    const hasTask = allTasks.some(task => {
-        const taskDate = new Date(task.date);
-        return taskDate.getFullYear() === date.getFullYear() &&
-               taskDate.getMonth() === date.getMonth() &&
-               taskDate.getDate() === date.getDate();
-    });
-    return (
-        <div className="relative h-full w-full flex items-center justify-center">
-            <span>{date.getDate()}</span>
-            {hasTask && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary"></div>}
-        </div>
-    );
-  };
 
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
         <Card>
             <CardHeader>
-                <CardTitle>Task Calendar</CardTitle>
-                <CardDescription>Select a day to view and manage tasks.</CardDescription>
+                <CardTitle>Task Manager</CardTitle>
+                <CardDescription>Select a date to view and manage tasks.</CardDescription>
             </CardHeader>
             <CardContent>
-               <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    className="rounded-md border p-0"
-                    classNames={{
-                        months: "flex flex-col sm:flex-row",
-                        month: "space-y-4 p-3",
-                        caption: "flex justify-center pt-1 relative items-center",
-                        table: "w-full border-collapse space-y-1",
-                        head_row: "flex",
-                        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-                        row: "flex w-full mt-2",
-                        day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-                        day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                        day_today: "bg-accent text-accent-foreground",
-                        day_outside: "text-muted-foreground opacity-50",
-                        day_disabled: "text-muted-foreground opacity-50",
-                    }}
-                    components={{
-                        DayContent: DayContent
-                    }}
-                />
+                <Select value={selectedDateFilter} onValueChange={setSelectedDateFilter}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a date filter..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="upcoming">Upcoming</SelectItem>
+                        <SelectItem value="all">All Tasks</SelectItem>
+                        {uniqueTaskDates.map(date => (
+                            <SelectItem key={date} value={date}>
+                                {format(new Date(date), 'PPP')}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </CardContent>
         </Card>
 
         <Card>
             <CardHeader>
-                <CardTitle>Tasks for {selectedDate ? selectedDate.toLocaleDateString() : 'today'}</CardTitle>
-                 <CardDescription>A list of tasks scheduled for the selected day.</CardDescription>
+                <CardTitle>{getFilterLabel()}</CardTitle>
+                 <CardDescription>A list of tasks scheduled for the selected filter.</CardDescription>
             </CardHeader>
             <CardContent>
-                 {tasksForSelectedDate.length > 0 ? (
-                    tasksForSelectedDate.map(task => <TaskItem key={task.id} task={task} />)
+                 {filteredTasks.length > 0 ? (
+                    filteredTasks.map(task => <TaskItem key={task.id} task={task} />)
                 ) : (
-                    <p className="text-muted-foreground text-center pt-8">No tasks for this day.</p>
-                )}
-            </CardContent>
-        </Card>
-
-
-        <Card>
-            <CardHeader>
-                <CardTitle>Upcoming Tasks</CardTitle>
-                <CardDescription>Your next 5 pending tasks.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                 {upcomingTasks.length > 0 ? (
-                    upcomingTasks.map(task => <TaskItem key={task.id} task={task} />)
-                ) : (
-                    <p className="text-muted-foreground text-center pt-8">No upcoming tasks.</p>
+                    <p className="text-muted-foreground text-center pt-8">No tasks match your filter.</p>
                 )}
             </CardContent>
         </Card>
@@ -201,7 +168,7 @@ export default function TasksPage() {
             isOpen={isFormOpen}
             onClose={closeForm}
             task={selectedTask}
-            selectedDate={selectedDate}
+            selectedDate={selectedDateFilter !== 'all' && selectedDateFilter !== 'upcoming' ? new Date(selectedDateFilter) : new Date()}
         />
     </div>
   );

@@ -68,7 +68,7 @@ export function NavLinks() {
         <div className="mx-auto grid max-w-2xl grid-cols-6 items-center justify-items-center gap-2">
             <Link
                 href="/"
-                className='flex flex-col items-center justify-center text-muted-foreground'
+                className='flex flex-col items-center justify-center text-muted-foreground w-full'
             >
                 <Home className="h-6 w-6" />
                 <span className="text-xs">Home</span>
@@ -80,8 +80,6 @@ export function NavLinks() {
               className={cn(
                 'flex flex-col items-center justify-center gap-1 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground w-full',
                  isNavItemActive(item.href) ? 'text-primary' : '',
-                 (item.label === 'Dashboard' || item.label === 'Records' || item.label === 'Reports') &&
-                 pathname.includes('tasks') ? 'hidden sm:flex' : 'flex'
               )}
             >
               <item.icon className="h-6 w-6" />
