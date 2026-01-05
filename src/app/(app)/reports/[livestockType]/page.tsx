@@ -4,10 +4,11 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { LivestockType, AgriTransaction } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
-import { Download, Printer } from 'lucide-react';
+import { Download, Printer, Calendar as CalendarIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Pie, PieChart, Cell } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AggregatedData {
   totalRevenue: number;
@@ -18,9 +19,27 @@ interface AggregatedData {
   expensesByCategory: { name: string; value: number }[];
 }
 
+interface PnLData {
+  monthlyData: {
+    month: string;
+    income: number;
+    expenses: number;
+    netProfit: number;
+  }[];
+  annualTotals: {
+    income: number;
+    expenses: number;
+    netProfit: number;
+  };
+}
+
 function formatCurrency(amount: number, currency: string) {
     return `${currency}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+const months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 
 
 export default function ReportsPage() {
@@ -30,6 +49,7 @@ export default function ReportsPage() {
 
   const { getTransactions, settings } = useAppContext();
   const { toast } = useToast();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
     notFound();
@@ -67,6 +87,25 @@ export default function ReportsPage() {
     
     return data;
   }, [transactions]);
+  
+  const pnlData: PnLData = useMemo(() => {
+    const yearlyTransactions = transactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
+    const monthlyData = months.map((month, index) => {
+        const monthTransactions = yearlyTransactions.filter(t => new Date(t.date).getMonth() === index);
+        const income = monthTransactions.filter(t => t.transactionType === 'income').reduce((acc, t) => acc + t.amount, 0);
+        const expenses = monthTransactions.filter(t => t.transactionType === 'expense').reduce((acc, t) => acc + t.amount, 0);
+        return { month, income, expenses, netProfit: income - expenses };
+    });
+
+    const annualTotals = monthlyData.reduce((acc, data) => {
+        acc.income += data.income;
+        acc.expenses += data.expenses;
+        acc.netProfit += data.netProfit;
+        return acc;
+    }, { income: 0, expenses: 0, netProfit: 0 });
+
+    return { monthlyData, annualTotals };
+  }, [transactions, selectedYear]);
 
   const generateCSV = () => {
     if (transactions.length === 0) {
@@ -102,7 +141,7 @@ export default function ReportsPage() {
     window.print();
   };
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#ff4d4d'];
+  const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
@@ -126,6 +165,66 @@ export default function ReportsPage() {
                 </Button>
             </div>
           </CardContent>
+        </Card>
+
+        <Card className="print-section">
+            <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <CardTitle>Profit & Loss Statement</CardTitle>
+                        <CardDescription>
+                            Yearly financial performance by month.
+                        </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2 no-print">
+                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                        <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Select Year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {years.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto rounded-lg border">
+                 <table className="w-full text-sm">
+                    <thead className="bg-muted/50">
+                        <tr className="text-left">
+                            <th className="p-3 font-medium">Month</th>
+                            <th className="p-3 font-medium text-right">Income</th>
+                            <th className="p-3 font-medium text-right">Expenses</th>
+                            <th className="p-3 font-medium text-right">Net Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pnlData.monthlyData.map((data, index) => (
+                          <tr key={data.month} className="border-b last:border-none">
+                              <td className="p-3 font-medium">{data.month}</td>
+                              <td className="p-3 text-right text-green-600">{formatCurrency(data.income, settings.currency)}</td>
+                              <td className="p-3 text-right text-red-600">{formatCurrency(data.expenses, settings.currency)}</td>
+                              <td className={`p-3 text-right font-semibold ${data.netProfit >= 0 ? 'text-foreground' : 'text-destructive'}`}>
+                                {formatCurrency(data.netProfit, settings.currency)}
+                              </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                    <tfoot className="bg-muted/50 font-bold">
+                        <tr>
+                            <td className="p-3">Annual Total</td>
+                            <td className="p-3 text-right text-green-600">{formatCurrency(pnlData.annualTotals.income, settings.currency)}</td>
+                            <td className="p-3 text-right text-red-600">{formatCurrency(pnlData.annualTotals.expenses, settings.currency)}</td>
+                            <td className={`p-3 text-right font-semibold ${pnlData.annualTotals.netProfit >= 0 ? 'text-foreground' : 'text-destructive'}`}>
+                                {formatCurrency(pnlData.annualTotals.netProfit, settings.currency)}
+                            </td>
+                        </tr>
+                    </tfoot>
+                 </table>
+              </div>
+            </CardContent>
         </Card>
         
         {/* Printable Report Layout */}
@@ -191,37 +290,41 @@ export default function ReportsPage() {
                   </div>
               </div>
               
-              {/* Transaction Table */}
-              <div>
-                  <h3 className="text-xl font-semibold text-gray-700 mb-4">Transaction Details</h3>
+              {/* P&L Table */}
+               <div>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">Profit & Loss Statement for {selectedYear}</h3>
                   <div className="overflow-x-auto rounded-lg border border-gray-200">
                       <table className="w-full text-sm">
-                          <thead className="bg-gray-50">
-                              <tr>
-                                  <th className="p-3 text-left font-medium text-gray-600">Date</th>
-                                  <th className="p-3 text-left font-medium text-gray-600">Description</th>
-                                  <th className="p-3 text-left font-medium text-gray-600">Category</th>
-                                  <th className="p-3 text-right font-medium text-gray-600">Amount</th>
+                           <thead className="bg-gray-50">
+                              <tr className="text-left">
+                                  <th className="p-3 font-medium text-gray-600">Month</th>
+                                  <th className="p-3 font-medium text-gray-600 text-right">Income</th>
+                                  <th className="p-3 font-medium text-gray-600 text-right">Expenses</th>
+                                  <th className="p-3 font-medium text-gray-600 text-right">Net Profit</th>
                               </tr>
                           </thead>
                           <tbody>
-                              {transactions.map((t, index) => (
-                                  <tr key={t.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                      <td className="p-3 text-gray-700">{new Date(t.date).toLocaleDateString()}</td>
-                                      <td className="p-3 text-gray-800 font-medium">{t.description}</td>
-                                      <td className="p-3 text-gray-700">{t.category}</td>
-                                      <td className={`p-3 text-right font-semibold ${t.transactionType === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                                          {t.transactionType === 'income' ? '+' : '-'}
-                                          {formatCurrency(t.amount, settings.currency)}
-                                      </td>
-                                  </tr>
-                              ))}
-                               {transactions.length === 0 && (
-                                <tr>
-                                    <td colSpan={4} className="text-center p-6 text-gray-500">No transactions for this period.</td>
+                              {pnlData.monthlyData.map((data, index) => (
+                                <tr key={data.month} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                    <td className="p-3 text-gray-800 font-medium">{data.month}</td>
+                                    <td className="p-3 text-right text-green-600">{formatCurrency(data.income, settings.currency)}</td>
+                                    <td className="p-3 text-right text-red-600">{formatCurrency(data.expenses, settings.currency)}</td>
+                                    <td className={`p-3 text-right font-semibold ${data.netProfit >= 0 ? 'text-gray-800' : 'text-red-700'}`}>
+                                      {formatCurrency(data.netProfit, settings.currency)}
+                                    </td>
                                 </tr>
-                               )}
+                              ))}
                           </tbody>
+                          <tfoot className="bg-gray-100 font-bold">
+                              <tr>
+                                  <td className="p-3 text-gray-800">Annual Total</td>
+                                  <td className="p-3 text-right text-green-700">{formatCurrency(pnlData.annualTotals.income, settings.currency)}</td>
+                                  <td className="p-3 text-right text-red-700">{formatCurrency(pnlData.annualTotals.expenses, settings.currency)}</td>
+                                  <td className={`p-3 text-right font-semibold ${pnlData.annualTotals.netProfit >= 0 ? 'text-gray-900' : 'text-red-800'}`}>
+                                      {formatCurrency(pnlData.annualTotals.netProfit, settings.currency)}
+                                  </td>
+                              </tr>
+                          </tfoot>
                       </table>
                   </div>
               </div>

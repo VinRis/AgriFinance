@@ -85,6 +85,10 @@
   .print-only {
     display: block !important;
   }
+  .print-section {
+    display: block !important;
+    break-inside: avoid;
+  }
   main {
     padding: 0 !important;
     margin: 0 !important;
@@ -95,4 +99,9 @@
     .print-only {
         display: none;
     }
+    .print-section {
+        display: block;
+    }
 }
+
+    
