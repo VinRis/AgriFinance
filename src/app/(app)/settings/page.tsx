@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const settingsSchema = z.object({
   farmName: z.string().min(1, 'Farm name is required'),
@@ -100,6 +101,13 @@ export default function SettingsPage() {
                   </FormItem>
                 )}
               />
+               <div className="flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <h3 className="text-sm font-medium">Appearance</h3>
+                    <p className="text-sm text-muted-foreground">Toggle between light and dark mode.</p>
+                  </div>
+                  <ThemeToggle />
+                </div>
             </CardContent>
             <CardFooter>
               <Button type="submit">Save Changes</Button>

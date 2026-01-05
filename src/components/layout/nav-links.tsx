@@ -1,9 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookCopy, FileText, LayoutDashboard, Milk, Settings, Bird } from 'lucide-react';
+import { BookCopy, FileText, LayoutDashboard, Milk, Settings, Bird, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 export function NavLinks() {
   const pathname = usePathname();
@@ -35,8 +34,6 @@ export function NavLinks() {
     },
   ];
 
-  const enterpriseIcon = livestockType === 'dairy' ? Milk : Bird;
-
   const isNavItemActive = (href: string) => {
     if (href.includes('dashboard')) return pathname.includes('dashboard');
     if (href.includes('records')) return pathname.includes('records');
@@ -48,13 +45,13 @@ export function NavLinks() {
     <>
       {/* Mobile Bottom Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background p-2 no-print">
-        <div className="mx-auto grid max-w-2xl grid-cols-6 items-center justify-items-center gap-2">
+        <div className="mx-auto grid max-w-2xl grid-cols-5 items-center justify-items-center gap-2">
             <Link
                 href="/"
                 className='flex flex-col items-center justify-center text-muted-foreground'
             >
-                <enterpriseIcon className="h-6 w-6" />
-                <span className="text-xs">{livestockType === 'dairy' ? 'Dairy' : 'Poultry'}</span>
+                <Home className="h-6 w-6" />
+                <span className="text-xs">Home</span>
             </Link>
           {navItems.map((item) => (
             <Link
@@ -69,10 +66,6 @@ export function NavLinks() {
               <span className="text-xs font-medium">{item.label}</span>
             </Link>
           ))}
-           <div className='flex flex-col items-center justify-center'>
-             <ThemeToggle />
-             <span className="mt-1 text-xs font-medium">Theme</span>
-           </div>
         </div>
       </div>
     </>
