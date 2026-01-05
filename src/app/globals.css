@@ -74,10 +74,18 @@
   }
 }
 
+@layer utilities {
+    .print-only {
+        display: none;
+    }
+}
+
 @media print {
   body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    background-color: white;
+    color: black;
   }
   .no-print {
     display: none !important;
@@ -85,23 +93,16 @@
   .print-only {
     display: block !important;
   }
-  .print-section {
-    display: block !important;
-    break-inside: avoid;
+  .print-page {
+    page-break-after: always;
+    page-break-inside: avoid;
+  }
+  .page-header {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
   }
   main {
     padding: 0 !important;
     margin: 0 !important;
   }
 }
-
-@layer utilities {
-    .print-only {
-        display: none;
-    }
-    .print-section {
-        display: block;
-    }
-}
-
-    

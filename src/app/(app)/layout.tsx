@@ -35,7 +35,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
          <>
             <Button
               onClick={handleFabClick}
-              className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-lg z-20"
+              className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-lg z-20 no-print"
               size="icon"
             >
               <Plus className="h-8 w-8" />
