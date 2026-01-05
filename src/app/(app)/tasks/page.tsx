@@ -155,7 +155,7 @@ export default function TasksPage() {
                             return (
                                 <div className="relative h-full w-full flex items-center justify-center">
                                     <span>{date.getDate()}</span>
-                                    {hasTask && <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary"></div>}
+                                    {hasTask && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary"></div>}
                                 </div>
                             );
                         }
