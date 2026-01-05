@@ -56,7 +56,8 @@ function aggregateData(transactions: AgriTransaction[]): AggregatedData {
 }
 
 
-export default function DashboardPage({ params: { livestockType } }: { params: { livestockType: string } }) {
+export default function DashboardPage({ params }: { params: { livestockType: string } }) {
+  const { livestockType } = params;
   const { getTransactions, settings } = useAppContext();
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
