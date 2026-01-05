@@ -27,7 +27,7 @@ const defaultSettings: AppSettings = {
   farmName: 'My Farm',
   managerName: 'Farm Manager',
   location: 'Green Valley',
-  currency: 'USD',
+  currency: '$',
 };
 
 const defaultState: State = {
@@ -58,10 +58,11 @@ function appReducer(state: State, action: Action): State {
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [storedState, setStoredState] = useLocalStorage<State>('agri-finance-pro-data', defaultState);
 
-  const initialState = useMemo(() => ({
-    transactions: storedState.transactions || [],
-    settings: { ...defaultSettings, ...storedState.settings },
-  }), [storedState]);
+  const initialState = useMemo(() => {
+    const transactions = storedState.transactions || [];
+    const settings = { ...defaultSettings, ...(storedState.settings || {}) };
+    return { transactions, settings };
+  }, [storedState]);
 
   const [state, dispatch] = useReducer(appReducer, initialState);
 

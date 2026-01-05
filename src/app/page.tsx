@@ -1,12 +1,81 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Download, Upload } from 'lucide-react';
+import { useAppContext } from '@/contexts/app-context';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { AgriTransaction, AppSettings } from '@/lib/types';
+import React, { useRef } from 'react';
+
+type AppState = {
+  transactions: AgriTransaction[];
+  settings: AppSettings;
+}
 
 export default function LivestockSelectionPage() {
   const dairyImage = PlaceHolderImages.find((img) => img.id === 'dairy-selection');
   const poultryImage = PlaceHolderImages.find((img) => img.id === 'poultry-selection');
+
+  const { transactions, settings, dispatch } = useAppContext();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleBackup = () => {
+    const appState = { transactions, settings };
+    const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `agrifinance-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({ title: 'Backup Successful', description: 'Your data has been downloaded.' });
+  };
+
+  const handleRestoreClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text !== 'string') {
+            throw new Error("File content is not readable text.");
+        }
+
+        const restoredState = JSON.parse(text) as AppState;
+
+        // Basic validation
+        if (restoredState.transactions && Array.isArray(restoredState.transactions) && restoredState.settings) {
+          dispatch({ type: 'SET_STATE', payload: restoredState });
+          toast({ title: 'Restore Successful', description: 'Your data has been restored.' });
+        } else {
+          throw new Error('Invalid backup file structure.');
+        }
+      } catch (error: any) {
+        console.error("Restore failed:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Restore Failed',
+          description: error.message || 'The selected file is not a valid backup.',
+        });
+      }
+    };
+    reader.readAsText(file);
+    // Reset file input
+    event.target.value = '';
+  };
+
 
   const selectionOptions = [
     {
@@ -64,6 +133,30 @@ export default function LivestockSelectionPage() {
             </Card>
           </Link>
         ))}
+      </div>
+       <div className="mt-12 w-full max-w-2xl">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center gap-4 p-6 sm:flex-row">
+            <h3 className="text-center font-semibold text-foreground">Manage Your Data</h3>
+            <div className="flex flex-col gap-4 sm:ml-auto sm:flex-row">
+              <Button onClick={handleBackup}>
+                <Download className="mr-2" />
+                Backup Data
+              </Button>
+              <Button onClick={handleRestoreClick} variant="outline">
+                <Upload className="mr-2" />
+                Restore Data
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="application/json"
+                className="hidden"
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );
