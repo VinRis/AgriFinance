@@ -11,11 +11,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose }
 import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, AgriTransaction } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -27,7 +22,7 @@ type RecordFormProps = {
 };
 
 const formSchema = z.object({
-  date: z.date({ required_error: 'A date is required.' }),
+  date: z.string().min(1, 'A date is required.'),
   transactionType: z.enum(['income', 'expense'], { required_error: 'Please select a transaction type.'}),
   category: z.string().min(1, 'Category is required.'),
   amount: z.coerce.number().min(0.01, 'Amount must be greater than 0.'),
@@ -46,7 +41,7 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: transaction
-      ? { ...transaction, date: new Date(transaction.date) }
+      ? { ...transaction, date: transaction.date.split('T')[0] }
       : { transactionType: 'expense', amount: 0, description: '' },
   });
 
@@ -58,8 +53,8 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
   useEffect(() => {
     if (isOpen) {
        form.reset(transaction
-        ? { ...transaction, date: new Date(transaction.date) }
-        : { transactionType: 'expense', amount: 0, description: '', date: new Date() }
+        ? { ...transaction, date: new Date(transaction.date).toISOString().split('T')[0] }
+        : { transactionType: 'expense', amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
       );
     }
   }, [isOpen, transaction, form]);
@@ -75,7 +70,7 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
     const transactionData = {
       ...data,
       id: transaction ? transaction.id : new Date().toISOString() + Math.random(),
-      date: data.date.toISOString(),
+      date: new Date(data.date).toISOString(),
       livestockType: livestockType,
       description: data.description || '',
     };
@@ -135,31 +130,9 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                       <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
