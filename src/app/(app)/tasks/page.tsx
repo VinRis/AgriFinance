@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit, Check, X } from 'lucide-react';
+import { Trash2, Edit } from 'lucide-react';
 import { FarmTask, LivestockType } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { TaskForm } from './task-form';
@@ -72,7 +72,7 @@ export default function TasksPage() {
   }
 
   const TaskItem = ({ task }: { task: FarmTask }) => (
-    <div className="flex items-center space-x-4 py-2 border-b last:border-b-0">
+    <div className="flex items-center space-x-4 py-3 border-b last:border-b-0">
       <Checkbox
         id={`task-${task.id}`}
         checked={task.status === 'completed'}
@@ -120,41 +120,64 @@ export default function TasksPage() {
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
         <Card>
-          <CardHeader>
-            <CardTitle>Task Scheduler</CardTitle>
-            <CardDescription>
-                Manage your farm tasks and appointments.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="flex justify-center">
+            <CardHeader>
+                <CardTitle>Task Calendar</CardTitle>
+                <CardDescription>Select a day to view and manage tasks.</CardDescription>
+            </CardHeader>
+            <CardContent>
                <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={setSelectedDate}
-                    className="rounded-md border"
-                    modifiers={{
-                        hasTask: allTasks.map(task => new Date(task.date)),
+                    className="rounded-md border p-0"
+                    classNames={{
+                        months: "flex flex-col sm:flex-row",
+                        month: "space-y-4 p-3",
+                        caption: "flex justify-center pt-1 relative items-center",
+                        table: "w-full border-collapse space-y-1",
+                        head_row: "flex",
+                        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                        row: "flex w-full mt-2",
+                        day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                        day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                        day_today: "bg-accent text-accent-foreground",
+                        day_outside: "text-muted-foreground opacity-50",
+                        day_disabled: "text-muted-foreground opacity-50",
                     }}
-                    modifiersStyles={{
-                        hasTask: { 
-                            fontWeight: 'bold', 
-                            textDecoration: 'underline',
-                            textDecorationColor: 'hsl(var(--primary))'
-                        },
+                    components={{
+                        DayContent: ({ date }) => {
+                            const hasTask = allTasks.some(task => {
+                                const taskDate = new Date(task.date);
+                                return taskDate.getFullYear() === date.getFullYear() &&
+                                       taskDate.getMonth() === date.getMonth() &&
+                                       taskDate.getDate() === date.getDate();
+                            });
+                            return (
+                                <div className="relative h-full w-full flex items-center justify-center">
+                                    <span>{date.getDate()}</span>
+                                    {hasTask && <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary"></div>}
+                                </div>
+                            );
+                        }
                     }}
                 />
-            </div>
-            <div>
-                <h3 className="text-lg font-semibold mb-2">Tasks for {selectedDate ? selectedDate.toLocaleDateString() : 'today'}</h3>
-                {tasksForSelectedDate.length > 0 ? (
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>Tasks for {selectedDate ? selectedDate.toLocaleDateString() : 'today'}</CardTitle>
+                 <CardDescription>A list of tasks scheduled for the selected day.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 {tasksForSelectedDate.length > 0 ? (
                     tasksForSelectedDate.map(task => <TaskItem key={task.id} task={task} />)
                 ) : (
                     <p className="text-muted-foreground text-center pt-8">No tasks for this day.</p>
                 )}
-            </div>
-          </CardContent>
+            </CardContent>
         </Card>
+
 
         <Card>
             <CardHeader>
