@@ -67,7 +67,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <p>You can export all your data as a CSV file or print a summary of your records.</p>
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex flex-col sm:flex-row gap-4">
                  <Button onClick={generateCSV} disabled={transactions.length === 0}>
                     <Download className="mr-2" />
                     Export All as CSV
@@ -77,23 +77,25 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
         
-        <div className="print-only">
-          <h1 className="text-2xl font-bold">{settings.farmName} - {title}</h1>
-          <p className="mb-4">{new Date().toLocaleDateString()}</p>
-          <table className="w-full border-collapse border">
-            <thead>
-              <tr>
-                {transactions.length > 0 && Object.keys(transactions[0]).map(key => <th className="border p-2 text-left" key={key}>{key}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map(transaction => (
-                <tr key={transaction.id}>
-                  {Object.values(transaction).map((val, i) => <td className="border p-2" key={i}>{String(val)}</td>)}
+        <div className="print-only overflow-x-auto">
+          <h1 className="text-xl sm:text-2xl font-bold">{settings.farmName} - {title}</h1>
+          <p className="mb-4 text-sm sm:text-base">{new Date().toLocaleDateString()}</p>
+          <div className="w-full">
+            <table className="w-full border-collapse border text-xs sm:text-sm">
+                <thead>
+                <tr>
+                    {transactions.length > 0 && Object.keys(transactions[0]).map(key => <th className="border p-2 text-left" key={key}>{key}</th>)}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                {transactions.map(transaction => (
+                    <tr key={transaction.id}>
+                    {Object.values(transaction).map((val, i) => <td className="border p-2 break-words" key={i}>{String(val)}</td>)}
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+          </div>
         </div>
     </div>
   );
