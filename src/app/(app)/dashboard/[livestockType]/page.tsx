@@ -5,8 +5,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, AgriTransaction } from '@/lib/types';
 import { DollarSign, TrendingUp, TrendingDown, BookOpen, Lightbulb } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Pie, PieChart, Cell, Legend } from 'recharts';
-import { useMemo, useState, useEffect } from 'react';
-import { getFinancialInsights } from '@/ai/flows/financial-insights-flow';
+import { useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AggregatedData {
@@ -64,6 +63,28 @@ function aggregateData(transactions: AgriTransaction[]): AggregatedData {
     };
 }
 
+function generateFinancialSummary(data: AggregatedData, currency: string): string {
+  if (data.totalTransactions === 0) {
+    return 'There is no transaction data to analyze.';
+  }
+
+  const { totalRevenue, totalExpenses, netProfit, pieChartData } = data;
+  let summary = `You've logged ${data.totalTransactions} transactions. Your total income is ${currency}${totalRevenue.toFixed(2)} and total expenses are ${currency}${totalExpenses.toFixed(2)}, resulting in a net profit of ${currency}${netProfit.toFixed(2)}. `;
+
+  if (pieChartData.length > 0) {
+    const highestExpenseCategory = pieChartData.reduce((max, cat) => cat.value > max.value ? cat : max);
+    summary += `Your largest expense category is "${highestExpenseCategory.name}" at ${currency}${highestExpenseCategory.value.toFixed(2)}. `;
+  }
+
+  if (netProfit > 0) {
+    summary += 'Keep up the great work!';
+  } else {
+    summary += 'Keep a close eye on your expenses to improve profitability.';
+  }
+
+  return summary;
+}
+
 
 export default function DashboardPage() {
   const pathname = usePathname();
@@ -71,39 +92,15 @@ export default function DashboardPage() {
   const livestockType = segments[segments.length - 1] as LivestockType;
   
   const { getTransactions, settings } = useAppContext();
-  const [insights, setInsights] = useState('');
-  const [loadingInsights, setLoadingInsights] = useState(true);
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
     notFound();
   }
 
   const transactions = getTransactions(livestockType);
-  const { totalRevenue, totalExpenses, netProfit, totalTransactions, barChartData, pieChartData } = aggregateData(transactions);
-
-  useEffect(() => {
-    async function fetchInsights() {
-      if (transactions.length > 0) {
-        setLoadingInsights(true);
-        try {
-          const insightText = await getFinancialInsights({
-            currency: settings.currency,
-            transactions: transactions.slice(-50) // Use last 50 transactions for analysis
-          });
-          setInsights(insightText);
-        } catch (error) {
-          console.error("Failed to fetch financial insights:", error);
-          setInsights("Could not load AI insights at the moment.");
-        } finally {
-          setLoadingInsights(false);
-        }
-      } else {
-        setInsights("No transaction data available to generate insights.");
-        setLoadingInsights(false);
-      }
-    }
-    fetchInsights();
-  }, [transactions, settings.currency]);
+  const aggregatedData = aggregateData(transactions);
+  const { totalRevenue, totalExpenses, netProfit, totalTransactions, barChartData, pieChartData } = aggregatedData;
+  const financialSummary = generateFinancialSummary(aggregatedData, settings.currency);
   
   const KPICard = ({ title, value, icon: Icon, description }: { title: string; value: string; icon: React.ElementType, description: string }) => (
     <Card>
@@ -244,18 +241,11 @@ export default function DashboardPage() {
             <Lightbulb className="h-6 w-6 text-primary" />
             <div>
               <CardTitle>Financial Snapshot</CardTitle>
-              <CardDescription>An AI-powered summary of your recent financial activity.</CardDescription>
+              <CardDescription>A summary of your recent financial activity.</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
-              {loadingInsights ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[80%]" />
-                  <Skeleton className="h-4 w-[60%]" />
-                </div>
-              ) : (
-                <p className="text-sm text-foreground/90 whitespace-pre-line">{insights}</p>
-              )}
+              <p className="text-sm text-foreground/90 whitespace-pre-line">{financialSummary}</p>
           </CardContent>
         </Card>
     </div>
