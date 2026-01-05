@@ -111,7 +111,7 @@ export default function DashboardPage() {
       <CardContent>
         {isHydrated ? (
           <>
-            <div className="text-2xl font-bold">{value}</div>
+            <div className="text-xl md:text-2xl font-bold">{value}</div>
             <p className="text-xs text-muted-foreground">{description}</p>
           </>
         ) : (
