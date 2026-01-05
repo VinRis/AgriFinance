@@ -10,6 +10,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LifeBuoy, MessageSquare, Phone } from 'lucide-react';
 
 const settingsSchema = z.object({
   farmName: z.string().min(1, 'Farm name is required'),
@@ -115,6 +116,39 @@ export default function SettingsPage() {
           </Card>
         </form>
        </Form>
+
+        <Card>
+            <CardHeader>
+                <div className="flex items-center gap-4">
+                    <LifeBuoy className="h-6 w-6 text-primary" />
+                    <div>
+                        <CardTitle>Help & Support</CardTitle>
+                        <CardDescription>
+                            Contact the developer for assistance.
+                        </CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <p className="text-sm text-foreground/90">
+                    If you encounter any issues or have questions, please don't hesitate to reach out.
+                </p>
+                <div className="flex items-center gap-4 rounded-lg border p-4">
+                    <Phone className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                        <h4 className="font-medium">Phone</h4>
+                        <a href="tel:+254732364559" className="text-primary hover:underline">+254732364559</a>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4 rounded-lg border p-4">
+                    <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                        <h4 className="font-medium">WhatsApp</h4>
+                        <a href="https://wa.me/254732364559" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">+254732364559</a>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     </div>
   );
 }
