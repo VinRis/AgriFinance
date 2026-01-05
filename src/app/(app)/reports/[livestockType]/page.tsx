@@ -188,7 +188,7 @@ export default function ReportsPage() {
 
   return (
     <>
-      <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 mb-20">
+      <main className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
         <div className="grid auto-rows-max items-start gap-4 md:gap-8">
           <Card className="no-print w-full">
             <CardHeader>
@@ -264,11 +264,10 @@ export default function ReportsPage() {
         
       {/* Printable Report Layout */}
       <div className="print-only">
-          {/* Page 1: Financial Summary */}
           <div className="print-page">
               <ReportHeader title="Financial Performance Summary" year={selectedYear} />
-              <div className="p-4 sm:p-8 space-y-8">
-                  {/* KPIs */}
+              <div className="p-4 sm:p-8 space-y-8 flex-grow">
+                  
                   <div className="grid grid-cols-3 gap-2 sm:gap-6 text-center">
                       <div className="bg-gray-100 p-2 sm:p-4 rounded-lg shadow">
                           <h3 className="text-xs sm:text-sm font-medium text-gray-500">Total Revenue</h3>
@@ -286,83 +285,43 @@ export default function ReportsPage() {
                       </div>
                   </div>
                   
-                  {/* Charts */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8" style={{height: '300px'}}>
-                      <div>
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2 text-center">Income vs. Expenses</h3>
-                          <ResponsiveContainer width="100%" height="100%">
-                              <BarChart data={[{ name: 'Financials', revenue: aggregatedData.totalRevenue, expenses: aggregatedData.totalExpenses }]}>
-                                  <XAxis dataKey="name" stroke="#888" fontSize={10} />
-                                  <YAxis stroke="#888" fontSize={10} tickFormatter={(v) => `${settings.currency}${v.toLocaleString('en-US')}`} />
-                                  <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
-                                  <Legend wrapperStyle={{fontSize: "10px"}}/>
-                                  <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
-                                  <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
-                              </BarChart>
-                          </ResponsiveContainer>
-                      </div>
-                      <div>
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2 text-center">Expense Breakdown</h3>
-                          <ResponsiveContainer width="100%" height="100%">
-                              <PieChart>
-                                  <Pie data={aggregatedData.expensesByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                                      {aggregatedData.expensesByCategory.map((entry, index) => (
-                                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                      ))}
-                                  </Pie>
-                                  <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
-                                  <Legend wrapperStyle={{fontSize: "10px", bottom: -5}}/>
-                              </PieChart>
-                          </ResponsiveContainer>
-                      </div>
-                  </div>
+                  {aggregatedData.totalTransactions > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8" style={{minHeight: '350px'}}>
+                        <div>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-4 text-center">Income vs. Expenses</h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <BarChart data={[{ name: 'Financials', revenue: aggregatedData.totalRevenue, expenses: aggregatedData.totalExpenses }]}>
+                                    <XAxis dataKey="name" stroke="#888" fontSize={10} />
+                                    <YAxis stroke="#888" fontSize={10} tickFormatter={(v) => `${settings.currency}${v.toLocaleString('en-US')}`} />
+                                    <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
+                                    <Legend wrapperStyle={{fontSize: "10px"}}/>
+                                    <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
+                                    <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-4 text-center">Expense Breakdown</h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Pie data={aggregatedData.expensesByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
+                                        {aggregatedData.expensesByCategory.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(v: number) => formatCurrency(v, settings.currency)} />
+                                    <Legend wrapperStyle={{fontSize: "10px", bottom: -5}} iconSize={10}/>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      No financial data available for the selected year.
+                    </div>
+                  )}
               </div>
-                <footer className="page-footer">
-                  <p>&copy; {new Date().getFullYear()} {settings.farmName}. All rights reserved.</p>
-                  <p>Agri Finance - Financial Management Simplified</p>
-              </footer>
-          </div>
-
-          {/* Page 2: P&amp;L Statement */}
-          <div className="print-page">
-              <ReportHeader title={`Profit &amp; Loss Statement`} year={selectedYear} />
-              <div className="p-4 sm:p-8">
-                  <div className="overflow-x-auto rounded-lg border border-gray-200">
-                      <table className="w-full text-sm">
-                          <thead className="bg-gray-50">
-                              <tr className="text-left">
-                                  <th className="p-3 font-medium text-gray-600">Month</th>
-                                  <th className="p-3 font-medium text-gray-600 text-right">Income</th>
-                                  <th className="p-3 font-medium text-gray-600 text-right">Expenses</th>
-                                  <th className="p-3 font-medium text-gray-600 text-right">Net Profit</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {pnlData.monthlyData.map((data, index) => (
-                              <tr key={data.month} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                  <td className="p-3 text-gray-800 font-medium">{data.month}</td>
-                                  <td className="p-3 text-right text-green-600">{formatCurrency(data.income, settings.currency)}</td>
-                                  <td className="p-3 text-right text-red-600">{formatCurrency(data.expenses, settings.currency)}</td>
-                                  <td className={`p-3 text-right font-semibold ${data.netProfit >= 0 ? 'text-gray-800' : 'text-red-700'}`}>
-                                      {formatCurrency(data.netProfit, settings.currency)}
-                                  </td>
-                              </tr>
-                              ))}
-                          </tbody>
-                          <tfoot className="bg-gray-100 font-bold">
-                              <tr>
-                                  <td className="p-3 text-gray-800">Annual Total</td>
-                                  <td className="p-3 text-right text-green-700">{formatCurrency(pnlData.annualTotals.income, settings.currency)}</td>
-                                  <td className="p-3 text-right text-red-700">{formatCurrency(pnlData.annualTotals.expenses, settings.currency)}</td>
-                                  <td className={`p-3 text-right font-semibold ${pnlData.annualTotals.netProfit >= 0 ? 'text-gray-900' : 'text-red-800'}`}>
-                                      {formatCurrency(pnlData.annualTotals.netProfit, settings.currency)}
-                                  </td>
-                              </tr>
-                          </tfoot>
-                      </table>
-                  </div>
-              </div>
-                <footer className="page-footer">
+              <footer className="page-footer">
                   <p>&copy; {new Date().getFullYear()} {settings.farmName}. All rights reserved.</p>
                   <p>Agri Finance - Financial Management Simplified</p>
               </footer>
@@ -371,5 +330,3 @@ export default function ReportsPage() {
     </>
   );
 }
-
-    
