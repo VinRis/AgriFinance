@@ -12,8 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 
-export default function RecordsPage({ params }: { params: { livestockType: string } }) {
-  const { livestockType } = params;
+export default function RecordsPage({ params: { livestockType } }: { params: { livestockType: string } }) {
   const { getTransactions, dispatch, settings } = useAppContext();
   const { toast } = useToast();
   const [isFormOpen, setFormOpen] = useState(false);

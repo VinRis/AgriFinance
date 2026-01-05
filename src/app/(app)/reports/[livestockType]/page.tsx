@@ -6,8 +6,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 
-export default function ReportsPage({ params }: { params: { livestockType: string } }) {
-  const { livestockType } = params;
+export default function ReportsPage({ params: { livestockType } }: { params: { livestockType: string } }) {
   const { getTransactions, settings } = useAppContext();
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
