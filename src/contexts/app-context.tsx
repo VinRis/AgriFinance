@@ -93,6 +93,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   
   const [state, dispatch] = useReducer(appReducer, defaultState);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isLocalStateLoaded, setIsLocalStateLoaded] = useState(false);
 
 
   const isCloudSyncing = useMemo(() => !!user, [user]);
@@ -159,44 +160,38 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   // Subscribe to Firestore data when logged in, or load from local storage once.
   useEffect(() => {
-    if (isUserLoading) return; // Wait until we know the auth state
+    if (isUserLoading) return;
 
     if (isCloudSyncing && userDocRef && transactionsColRef && tasksColRef) {
-        setIsHydrated(false); // Reset hydration flag for cloud data
-        const unsubSettings = onSnapshot(userDocRef, (doc) => {
-          if (doc.exists()) {
-            dispatch({ type: 'UPDATE_SETTINGS', payload: doc.data() as AppSettings });
-          } else {
-            if(firestore) {
-              setDoc(userDocRef, defaultSettings);
-            }
-          }
-        });
-        
-        const unsubTransactions = onSnapshot(query(transactionsColRef), (snapshot) => {
-          const transactions = snapshot.docs.map(doc => doc.data() as AgriTransaction);
-          dispatch({ type: 'SET_STATE', payload: { ...state, transactions } });
-        });
+      setIsHydrated(false);
+      const unsubSettings = onSnapshot(userDocRef, (doc) => {
+        dispatch({ type: 'UPDATE_SETTINGS', payload: (doc.data() as AppSettings) || defaultSettings });
+      });
 
-        const unsubTasks = onSnapshot(query(tasksColRef), (snapshot) => {
+      const unsubTransactions = onSnapshot(query(transactionsColRef), (snapshot) => {
+        const transactions = snapshot.docs.map((doc) => doc.data() as AgriTransaction);
+        dispatch({ type: 'SET_STATE', payload: { transactions } });
+      });
+      
+      const unsubTasks = onSnapshot(query(tasksColRef), (snapshot) => {
           const tasks = snapshot.docs.map(doc => doc.data() as FarmTask);
           dispatch({ type: 'SET_STATE', payload: { ...state, tasks } });
           if (!isHydrated) setIsHydrated(true);
-        });
+      });
 
-        return () => {
-          unsubSettings();
-          unsubTransactions();
-          unsubTasks();
-          setIsHydrated(false);
-        };
-    } else if (!isCloudSyncing) {
-      // Not logged in, load from local storage once.
+      return () => {
+        unsubSettings();
+        unsubTransactions();
+        unsubTasks();
+        setIsHydrated(false);
+      };
+    } else if (!isCloudSyncing && !isLocalStateLoaded) {
       dispatch({ type: 'SET_STATE', payload: storedState });
+      setIsLocalStateLoaded(true); // Mark local state as loaded
       setIsHydrated(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCloudSyncing, isUserLoading, userDocRef]);
+  }, [isUserLoading, isCloudSyncing, userDocRef, storedState, isLocalStateLoaded]);
 
 
   // Persist state to local storage if not logged in
