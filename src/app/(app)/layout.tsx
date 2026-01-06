@@ -9,9 +9,11 @@ import { RecordForm } from './records/[livestockType]/record-form';
 import { TaskForm } from './tasks/task-form';
 import { LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useExitPrompt } from '@/hooks/use-exit-prompt';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  useExitPrompt(true);
   const [isFormOpen, setFormOpen] = useState(false);
   const segments = pathname.split('/');
   const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
@@ -61,5 +63,3 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
-    
