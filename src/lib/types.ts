@@ -24,6 +24,7 @@ export interface FarmTask {
   id: string;
   title: string;
   date: string; // ISO string
+  time: string; // HH:mm format
   livestockType: LivestockType | 'general';
   description: string;
   status: TaskStatus;
