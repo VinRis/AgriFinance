@@ -6,6 +6,12 @@ import {AppProvider} from '@/contexts/app-context';
 import { PWALifecycle } from '@/components/pwa-lifecycle';
 import { InstallPWA } from '@/components/install-pwa';
 
+declare global {
+  interface Window {
+    workbox: any;
+  }
+}
+
 export const metadata: Metadata = {
   title: 'Agri Finance',
   description: 'Financial management for your livestock enterprise.',
