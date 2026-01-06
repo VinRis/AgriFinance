@@ -7,12 +7,13 @@ import { ArrowRight, Download, Upload, Lightbulb } from 'lucide-react';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { AgriTransaction, AppSettings } from '@/lib/types';
+import { AgriTransaction, AppSettings, FarmTask } from '@/lib/types';
 import React, { useRef, useState, useEffect } from 'react';
 
 type AppState = {
   transactions: AgriTransaction[];
   settings: AppSettings;
+  tasks: FarmTask[];
 }
 
 const farmTips = [
@@ -74,14 +75,22 @@ export default function LivestockSelectionPage() {
             throw new Error("File content is not readable text.");
         }
 
-        const restoredState = JSON.parse(text) as AppState;
+        const parsedData = JSON.parse(text);
 
-        // Basic validation
-        if (restoredState.transactions && Array.isArray(restoredState.transactions) && restoredState.settings) {
+        // This is the migration logic.
+        // It ensures old backups work with new versions of the app.
+        const restoredState: Partial<AppState> = {
+          transactions: parsedData.transactions || [],
+          settings: parsedData.settings || {},
+          tasks: parsedData.tasks || [], // If 'tasks' is missing, it defaults to an empty array.
+        };
+
+        // Basic validation after migration
+        if (Array.isArray(restoredState.transactions) && restoredState.settings && Array.isArray(restoredState.tasks)) {
           dispatch({ type: 'SET_STATE', payload: restoredState });
           toast({ title: 'Restore Successful', description: 'Your data has been restored.' });
         } else {
-          throw new Error('Invalid backup file structure.');
+          throw new Error('File is not a valid backup. It might be corrupted.');
         }
       } catch (error: any) {
         console.error("Restore failed:", error);
