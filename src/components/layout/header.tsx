@@ -12,13 +12,13 @@ export function Header() {
     const segments = pathname.split('/');
     let livestockType: string | null = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
     
-    if (pathname.includes('/settings') || pathname.includes('/tasks')) {
+    if (pathname.includes('/settings') || pathname.includes('/tasks') || pathname.includes('/finances')) {
         livestockType = lastSelectedType;
     }
 
     let title = '';
     if(pathname.includes('dashboard')) title = 'Dashboard';
-    else if(pathname.includes('records')) title = 'Records';
+    else if(pathname.includes('finances')) title = 'Finances';
     else if(pathname.includes('reports')) title = 'Reports';
     else if(pathname.includes('settings')) title = 'Settings';
     else if(pathname.includes('tasks')) title = 'Schedule';
@@ -37,8 +37,7 @@ export function Header() {
     const EnterpriseIcon = getIcon();
 
     const getEnterpriseName = () => {
-        if(pathname.includes('/tasks')) return null;
-        if(pathname.includes('/settings')) return null;
+        if(pathname.includes('/tasks') || pathname.includes('/settings')) return null;
         return livestockType === 'dairy' ? 'Dairy' : 'Poultry';
     }
     const enterpriseName = getEnterpriseName();
@@ -46,6 +45,9 @@ export function Header() {
     const renderTitle = () => {
       if (pathname.includes('/tasks')) {
         return <h1 className="text-xl font-bold md:text-2xl">{format(new Date(), 'MMMM yyyy')}</h1>;
+      }
+       if (pathname.includes('/finances')) {
+        return <h1 className="text-lg font-semibold md:text-xl">Farm Finances</h1>
       }
       return (
         <h1 className="text-lg font-semibold md:text-xl">
@@ -65,6 +67,18 @@ export function Header() {
             </div>
          )
        }
+       
+       if(pathname.includes('/finances')) {
+         return (
+              <div className="flex w-full items-center justify-between">
+                {renderTitle()}
+                <div className="flex items-center gap-2">
+                    {/* User Profile Icon */}
+                </div>
+            </div>
+         )
+       }
+
        return (
            <>
               <div className="flex items-center gap-2">

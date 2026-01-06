@@ -24,14 +24,23 @@ export function NavLinks() {
 
   if (pathname === '/') return null;
 
-  const navItems = [
+  const isNavItemActive = (href: string) => {
+    if (href.includes('dashboard')) return pathname.includes('dashboard');
+    if (href.includes('finances')) return pathname.includes('finances');
+    if (href.includes('tasks')) return pathname.includes('tasks');
+    if (href.includes('reports')) return pathname.includes('reports');
+    if (href.includes('settings')) return pathname.includes('settings');
+    return pathname === href;
+  };
+  
+   const combinedNavItems = [
     {
       href: `/dashboard/${livestockType}`,
       icon: LayoutDashboard,
       label: 'Dashboard',
     },
-    {
-      href: `/records/${livestockType}`,
+     {
+      href: `/finances/${livestockType}`,
       icon: BookCopy,
       label: 'Finances',
     },
@@ -44,45 +53,6 @@ export function NavLinks() {
       href: `/reports/${livestockType}`,
       icon: FileText,
       label: 'Reports',
-    },
-    {
-      href: `/settings`,
-      icon: Settings,
-      label: 'Settings',
-    },
-  ];
-
-  const isNavItemActive = (href: string) => {
-    if (href.includes('dashboard')) return pathname.includes('dashboard');
-    if (href.includes('records')) return pathname.includes('records') || pathname.includes('reports');
-    if (href.includes('tasks')) return pathname.includes('tasks');
-    if (href.includes('settings')) return pathname.includes('settings');
-    return pathname === href;
-  };
-  
-  // Custom logic for finances to include records and reports
-   const getFinanceHref = () => {
-    const recordsPath = `/records/${livestockType}`;
-    // If we are on reports, keep the nav link to reports, otherwise default to records
-    return pathname.includes('/reports') ? `/reports/${livestockType}` : recordsPath;
-   }
-   
-   const combinedNavItems = [
-    {
-      href: `/dashboard/${livestockType}`,
-      icon: LayoutDashboard,
-      label: 'Dashboard',
-    },
-     {
-      href: `/tasks`,
-      icon: CalendarDays,
-      label: 'Schedule',
-    },
-    {
-      href: getFinanceHref(),
-      icon: BookCopy,
-      label: 'Finances',
-      isActive: pathname.includes('/records') || pathname.includes('/reports')
     },
     {
       href: `/settings`,
@@ -109,7 +79,7 @@ export function NavLinks() {
               key={item.label}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground w-full',
-                 item.isActive || isNavItemActive(item.href) ? 'text-green-600 font-bold' : '',
+                 isNavItemActive(item.href) ? 'text-green-600 font-bold' : '',
               )}
             >
               <item.icon className="h-5 w-5" />

@@ -5,7 +5,7 @@ import { NavLinks } from '@/components/layout/nav-links';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { RecordForm } from './records/[livestockType]/record-form';
+import { RecordForm } from './finances/[livestockType]/record-form';
 import { TaskForm } from './tasks/task-form';
 import { LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -26,22 +26,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setFormOpen(true);
   };
 
-  const isRecordsPage = pathname.includes('/records');
+  const isFinancesPage = pathname.includes('/finances');
   const isTasksPage = pathname.includes('/tasks');
 
   const renderForm = () => {
     if (isTasksPage) {
         return <TaskForm isOpen={isFormOpen} onClose={() => setFormOpen(false)} />
     }
-    if (isRecordsPage) {
+    if (isFinancesPage) {
         return <RecordForm livestockType={livestockType} isOpen={isFormOpen} onClose={() => setFormOpen(false)} />
     }
     return null;
   }
 
   const fabClasses = cn(
-    "fixed bottom-20 right-6 rounded-2xl shadow-lg z-20 no-print transition-all duration-300",
-    isTasksPage ? "h-16 w-16 bg-green-500 hover:bg-green-600" : "h-16 w-16"
+    "fixed bottom-20 right-6 rounded-full shadow-lg z-20 no-print transition-all duration-300 h-16 w-16 bg-green-500 hover:bg-green-600"
   );
 
 
@@ -54,7 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
       <NavLinks />
-      {(isRecordsPage || isTasksPage) && (
+      {(isFinancesPage || isTasksPage) && (
          <>
             <Button
               onClick={handleFabClick}
