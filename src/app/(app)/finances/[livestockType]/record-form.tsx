@@ -13,6 +13,8 @@ import { LivestockType, AgriTransaction } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Trash2 } from 'lucide-react';
 
 type RecordFormProps = {
   livestockType: LivestockType;
@@ -83,6 +85,18 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
       toast({ title: 'Transaction Added', description: 'A new transaction has been created.' });
     }
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (transaction) {
+        dispatch({ type: 'DELETE_TRANSACTION', payload: transaction.id });
+        toast({
+            variant: 'destructive',
+            title: 'Transaction Deleted',
+            description: 'The transaction has been removed.',
+        });
+        onClose();
+    }
   };
 
   return (
@@ -184,11 +198,39 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
                 )}
               />
             </div>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button type="button" variant="outline">Cancel</Button>
-              </SheetClose>
-              <Button type="submit">Save Transaction</Button>
+            <SheetFooter className="sm:justify-between">
+              <div>
+                {transaction && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button type="button" variant="destructive" className="w-full sm:w-auto">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete this transaction from your records.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                          Yes, delete it
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+              <div className="flex gap-2 justify-end mt-4 sm:mt-0">
+                <SheetClose asChild>
+                  <Button type="button" variant="outline">Cancel</Button>
+                </SheetClose>
+                <Button type="submit">Save Transaction</Button>
+              </div>
             </SheetFooter>
           </form>
         </Form>
