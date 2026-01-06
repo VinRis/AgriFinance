@@ -25,5 +25,15 @@ export default function HomePage() {
   }
   
   // If not loading and no user, show the login page
-  return <LoginPage />;
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  // If logged in, redirect will happen via useEffect. Show a loader in the meantime.
+  return (
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40">
+      <Loader className="h-12 w-12 animate-spin text-primary" />
+      <p className="mt-4 text-muted-foreground">Redirecting...</p>
+    </div>
+  );
 }

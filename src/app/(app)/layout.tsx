@@ -33,7 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [isUserLoading, user, router]);
 
-  if (isUserLoading || !user) {
+  if (isUserLoading) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40">
         <Loader className="h-12 w-12 animate-spin text-primary" />
@@ -41,6 +41,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
+  
+  if (!user) {
+    return null; // Don't render anything if user is not logged in, redirect will handle it.
+  }
+
 
   const handleFabClick = () => {
     setFormOpen(true);

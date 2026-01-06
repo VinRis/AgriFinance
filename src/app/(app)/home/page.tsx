@@ -214,11 +214,11 @@ export default function LivestockSelectionPage() {
                 <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4">
                     <div className="flex flex-col gap-4 sm:flex-row">
                         <Button onClick={handleBackup}>
-                            <Download className="mr-2" />
+                            <Download className="mr-2 h-4 w-4" />
                             Backup Data
                         </Button>
                         <Button onClick={handleRestoreClick} variant="outline">
-                            <Upload className="mr-2" />
+                            <Upload className="mr-2 h-4 w-4" />
                             Restore Data
                         </Button>
                         <input
