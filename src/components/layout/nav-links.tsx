@@ -22,9 +22,10 @@ export function NavLinks() {
 
   const livestockType = pathLivestockType || lastSelectedType;
 
-  if (pathname === '/') return null;
+  if (pathname === '/login' || pathname === '/') return null;
 
   const isNavItemActive = (href: string) => {
+    if (href.includes('/home')) return pathname.includes('/home');
     if (href.includes('dashboard')) return pathname.includes('dashboard');
     if (href.includes('finances')) return pathname.includes('finances');
     if (href.includes('tasks')) return pathname.includes('tasks');
@@ -67,8 +68,8 @@ export function NavLinks() {
       <div className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background/95 backdrop-blur-sm p-2 no-print">
         <div className="mx-auto grid max-w-2xl grid-cols-6 items-center justify-items-center gap-1">
             <Link
-                href="/"
-                className='flex flex-col items-center justify-center text-muted-foreground w-full gap-1 p-2'
+                href="/home"
+                className={cn('flex flex-col items-center justify-center text-muted-foreground w-full gap-1 p-2', isNavItemActive('/home') && 'text-green-600 font-bold')}
             >
                 <Home className="h-5 w-5" />
                 <span className="text-xs">Home</span>

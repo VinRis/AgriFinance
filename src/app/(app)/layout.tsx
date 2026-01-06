@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { NavLinks } from '@/components/layout/nav-links';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,14 @@ import { LivestockType } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useExitPrompt } from '@/hooks/use-exit-prompt';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/firebase';
+import { Loader } from 'lucide-react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
+
   useExitPrompt(true);
   const [isFormOpen, setFormOpen] = useState(false);
   const segments = pathname.split('/');
@@ -21,6 +26,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   
   const pathLivestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
   const livestockType = (pathLivestockType || lastSelectedType) as LivestockType;
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [isUserLoading, user, router]);
+
+  if (isUserLoading || !user) {
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40">
+        <Loader className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Loading your farm...</p>
+      </div>
+    );
+  }
 
   const handleFabClick = () => {
     setFormOpen(true);
