@@ -21,6 +21,23 @@ const settingsSchema = z.object({
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
+const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+);
+
 export default function SettingsPage() {
   const { settings, dispatch } = useAppContext();
   const { toast } = useToast();
@@ -145,6 +162,13 @@ export default function SettingsPage() {
                     <div>
                         <h4 className="font-medium">WhatsApp</h4>
                         <a href="https://wa.me/254732364559" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Click to chat on WhatsApp</a>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4 rounded-lg border p-4">
+                    <FacebookIcon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                        <h4 className="font-medium">Facebook</h4>
+                        <a href="http://facebook.com/KienyejiPoultryFarmers" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Follow us on Facebook</a>
                     </div>
                 </div>
             </CardContent>
