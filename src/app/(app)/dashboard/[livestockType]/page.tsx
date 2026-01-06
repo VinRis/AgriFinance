@@ -257,6 +257,37 @@ export default function DashboardPage() {
 
   const breakevenProgress = totalExpenses > 0 ? (totalRevenue / totalExpenses) * 100 : 0;
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-lg border bg-background p-2 shadow-sm">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col space-y-1">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                {label || payload[0]?.name}
+              </span>
+              <span className="font-bold text-foreground">
+                {formatCurrency(payload[0].value, settings.currency)}
+              </span>
+            </div>
+            {payload[1] && (
+              <div className="flex flex-col space-y-1">
+                  <span className="text-[0.70rem] uppercase text-muted-foreground">
+                    {payload[1].name}
+                  </span>
+                  <span className="font-bold text-muted-foreground">
+                    {formatCurrency(payload[1].value, settings.currency)}
+                  </span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
         <div className="flex justify-between items-center">
@@ -419,15 +450,8 @@ export default function DashboardPage() {
                           <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                           <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${settings.currency}${value.toLocaleString('en-US')}`} />
                           <Tooltip
-                            cursor={{ fill: 'hsl(var(--muted))', radius: 'var(--radius)'}}
-                            contentStyle={{
-                              backgroundColor: 'hsl(var(--background))',
-                              borderColor: 'hsl(var(--border))',
-                              borderRadius: 'var(--radius)',
-                              boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)',
-                              color: 'hsl(var(--foreground))'
-                            }}
-                            formatter={(value: number) => formatCurrency(value, settings.currency)}
+                            cursor={{ fill: 'hsl(var(--muted))'}}
+                            content={<CustomTooltip />}
                           />
                           <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Revenue" />
                           <Bar dataKey="expenses" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} name="Expenses" />
@@ -475,14 +499,7 @@ export default function DashboardPage() {
                     </Pie>
                     <Tooltip
                         cursor={{ fill: 'hsl(var(--muted))' }}
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--background))',
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: 'var(--radius)',
-                          boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)',
-                          color: 'hsl(var(--foreground))'
-                        }}
-                        formatter={(value: number) => formatCurrency(value, settings.currency)}
+                        content={<CustomTooltip />}
                     />
                     <Legend iconSize={12} iconType="circle" />
                   </PieChart>
