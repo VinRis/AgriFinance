@@ -6,6 +6,25 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: false,
   disable: process.env.NODE_ENV === 'development',
+  runtimeCaching: [
+    {
+      urlPattern: ({ request }) => request.mode === 'navigate',
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'pages',
+        expiration: {
+          maxEntries: 60,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+  ],
+  fallbacks: {
+    document: '/offline',
+  }
 });
 
 
