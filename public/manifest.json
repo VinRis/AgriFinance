@@ -1,11 +1,12 @@
 {
   "name": "Agri Finance Pro",
   "short_name": "AgriFinance",
-  "description": "Financial management for your livestock enterprise.",
-  "start_url": "/",
-  "display": "standalone",
+  "theme_color": "#22c55e",
   "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
       "src": "/images/icon-192x192.png",
