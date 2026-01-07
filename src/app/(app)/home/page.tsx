@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Download, Upload, Lightbulb, Cloud } from 'lucide-react';
+import { ArrowRight, Download, Upload, Lightbulb, Cloud, LogIn } from 'lucide-react';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 type AppState = {
   transactions: AgriTransaction[];
@@ -250,31 +260,6 @@ export default function LivestockSelectionPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-
-            <AlertDialog>
-              <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4 bg-background/80">
-                  <AlertDialogTrigger asChild>
-                    <Button variant="default">
-                        <Cloud className="mr-2 h-4 w-4" />
-                        Login to Sync
-                    </Button>
-                  </AlertDialogTrigger>
-                  <p className="text-xs text-muted-foreground text-center mt-2">
-                      Sync your data across multiple devices.
-                  </p>
-              </div>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Feature Coming Soon!</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    We are working hard to bring you cloud synchronization. This will allow you to access your farm data from any device, anywhere. Stay tuned for updates!
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogAction>Got it!</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </CardContent>
         </Card>
       </div>
