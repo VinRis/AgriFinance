@@ -3,12 +3,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowRight, Download, Upload, Lightbulb } from 'lucide-react';
+import { ArrowRight, Download, Upload, Lightbulb, LogIn } from 'lucide-react';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { AgriTransaction, AppSettings, FarmTask } from '@/lib/types';
 import React, { useRef, useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 
 type AppState = {
   transactions: AgriTransaction[];
@@ -121,7 +131,7 @@ export default function LivestockSelectionPage() {
   ];
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-background to-secondary/50 p-4 sm:p-6 -m-4 sm:-mx-6 sm:-my-0">
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-background to-secondary/50 p-4 sm:p-6">
       <div className="w-full max-w-4xl text-center">
         <h1 className="font-headline text-4xl font-bold tracking-tight text-primary sm:text-5xl md:text-6xl">
           Welcome to Agri Finance
@@ -199,27 +209,55 @@ export default function LivestockSelectionPage() {
                   </div>
               </div>
             
-            <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4">
-                <div className="flex flex-col gap-4 sm:flex-row">
-                    <Button onClick={handleBackup}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Backup Data
-                    </Button>
-                    <Button onClick={handleRestoreClick} variant="outline">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Restore Data
-                    </Button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept="application/json"
-                        className="hidden"
-                    />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4">
+                    <div className="flex flex-col gap-4 sm:flex-row">
+                        <Button onClick={handleBackup}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Backup Data
+                        </Button>
+                        <Button onClick={handleRestoreClick} variant="outline">
+                            <Upload className="mr-2 h-4 w-4" />
+                            Restore Data
+                        </Button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="application/json"
+                            className="hidden"
+                        />
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                        Your data is stored locally on your device. Keep a weekly backup to prevent data loss.
+                    </p>
                 </div>
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                    Your data is stored locally on your device. Keep a weekly backup to prevent data loss.
-                </p>
+                 <Dialog>
+                    <DialogTrigger asChild>
+                        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+                           <Button>
+                               <LogIn className="mr-2 h-4 w-4" />
+                               Login to Sync
+                           </Button>
+                           <p className="text-xs text-muted-foreground text-center mt-2">
+                               Sync your data across multiple devices.
+                           </p>
+                        </div>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Coming Soon!</DialogTitle>
+                            <DialogDescription>
+                                We are working hard to bring you cloud synchronization. This feature will allow you to access your farm data from any device, anywhere. Stay tuned for updates!
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button>OK</Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
           </CardContent>
         </Card>
