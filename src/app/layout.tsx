@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   description: 'Financial management for your livestock enterprise.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icon.png',
-    apple: '/icon.png',
+    icon: '/favicon.ico', // This will now correctly point to src/app/favicon.ico
+    apple: '/images/icon-192x192.png',
   },
 };
 
