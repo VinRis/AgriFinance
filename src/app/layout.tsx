@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Financial management for your livestock enterprise.',
   manifest: '/manifest.json',
   icons: {
-    apple: '/apple-touch-icon.png',
+    apple: '/images/apple-touch-icon.png',
   },
 };
 
@@ -36,6 +36,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="theme-color" content="#3F704F" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body suppressHydrationWarning={true}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
