@@ -1,6 +1,6 @@
 {
-  "name": "Agri Finance Pro",
-  "short_name": "AgriFinance",
+  "name": "Agri Finance",
+  "short_name": "AgriFin",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#3F704F",
-  "background_color": "#ffffff",
+  "theme_color": "#2563EB",
+  "background_color": "#F8FAFC",
   "display": "standalone"
 }
