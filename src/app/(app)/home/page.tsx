@@ -3,22 +3,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Download, Upload, Lightbulb, Cloud, LogIn } from 'lucide-react';
+import { ArrowRight, Download, Upload, Lightbulb, Cloud, LogIn, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { AgriTransaction, AppSettings, FarmTask } from '@/lib/types';
 import React, { useRef, useState, useEffect } from 'react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import {
   Dialog,
   DialogClose,
@@ -29,6 +19,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { differenceInDays, parseISO } from 'date-fns';
 
 type AppState = {
   transactions: AgriTransaction[];
@@ -57,12 +49,26 @@ export default function LivestockSelectionPage() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [randomTip, setRandomTip] = useState('');
+  const [lastBackupDate, setLastBackupDate] = useLocalStorage<string | null>('last-backup-date', null);
+  const [showBackupReminder, setShowBackupReminder] = useState(false);
+
 
   useEffect(() => {
     // Select a random tip only on the client side to avoid hydration mismatch
     const randomIndex = Math.floor(Math.random() * farmTips.length);
     setRandomTip(farmTips[randomIndex]);
-  }, []);
+
+    if (lastBackupDate) {
+      const daysSinceLastBackup = differenceInDays(new Date(), parseISO(lastBackupDate));
+      if (daysSinceLastBackup > 7) {
+        setShowBackupReminder(true);
+      }
+    } else {
+      // If there's no backup date, show the reminder
+      setShowBackupReminder(true);
+    }
+
+  }, [lastBackupDate]);
 
   const handleBackup = () => {
     const appState = { transactions, settings, tasks };
@@ -70,12 +76,15 @@ export default function LivestockSelectionPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `agrifinance-backup-${new Date().toISOString().split('T')[0]}.json`;
+    const today = new Date().toISOString().split('T')[0];
+    link.download = `agrifinance-backup-${today}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     toast({ title: 'Backup Successful', description: 'Your data has been downloaded.' });
+    setLastBackupDate(new Date().toISOString());
+    setShowBackupReminder(false);
   };
 
   const handleRestoreClick = () => {
@@ -216,6 +225,14 @@ export default function LivestockSelectionPage() {
               </div>
             
             <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4 bg-background/80">
+                {showBackupReminder && (
+                  <div className="flex items-center gap-3 rounded-lg border border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/20 p-3 text-yellow-700 dark:text-yellow-300 w-full">
+                    <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+                    <div className="text-sm font-medium">
+                      <p>Remember to back up your data weekly to prevent any loss.</p>
+                    </div>
+                  </div>
+                )}
                 <div className="flex flex-col gap-4 sm:flex-row">
                     <Button onClick={handleBackup}>
                         <Download className="mr-2 h-4 w-4" />
