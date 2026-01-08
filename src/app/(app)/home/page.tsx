@@ -42,14 +42,14 @@ const farmTips = [
 
 export default function LivestockSelectionPage() {
   const dairyImage = {
-    imageUrl: "https://images.unsplash.com/photo-1509343256512-d77a5cb3791b?q=80&w=2070&auto=format&fit=crop",
-    description: "A coastal view from inside a cave",
-    imageHint: "coast sea"
+    imageUrl: "https://images.unsplash.com/photo-1570042707198-315f617c5a03?q=80&w=2070&auto=format&fit=crop",
+    description: "A dairy cow in a field",
+    imageHint: "dairy cow"
   };
   const poultryImage = {
-    imageUrl: "https://images.unsplash.com/photo-1502674258221-934839c9444d?q=80&w=1932&auto=format&fit=crop",
-    description: "A person standing on a structure in the water",
-    imageHint: "person sea"
+    imageUrl: "https://images.unsplash.com/photo-1582172749449-35b364455242?q=80&w=1932&auto=format&fit=crop",
+    description: "A chicken in a coop",
+    imageHint: "chicken poultry"
   };
 
   const { transactions, settings, tasks, dispatch } = useAppContext();
