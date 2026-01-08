@@ -1,0 +1,12 @@
+{
+  "dairy": {
+    "imageUrl": "https://images.unsplash.com/photo-1570042707198-315f617c5a03?q=80&w=600&auto=format&fit=crop",
+    "description": "A dairy cow in a field",
+    "imageHint": "dairy cow"
+  },
+  "poultry": {
+    "imageUrl": "https://images.unsplash.com/photo-1582172749449-35b364455242?q=80&w=600&auto=format&fit=crop",
+    "description": "A chicken in a coop",
+    "imageHint": "chicken poultry"
+  }
+}

@@ -31,3 +31,9 @@ export interface FarmTask {
   priority: 'low' | 'medium' | 'high';
   reminder: boolean;
 }
+
+export interface PlaceholderImage {
+    imageUrl: string;
+    description: string;
+    imageHint: string;
+}

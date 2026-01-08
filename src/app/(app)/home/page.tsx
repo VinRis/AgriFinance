@@ -6,7 +6,7 @@ import { ArrowRight, Download, Upload, Lightbulb, Cloud, LogIn, AlertTriangle } 
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { AgriTransaction, AppSettings, FarmTask } from '@/lib/types';
+import { AgriTransaction, AppSettings, FarmTask, PlaceholderImage } from '@/lib/types';
 import React, { useRef, useState, useEffect } from 'react';
 import {
   Dialog,
@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/dialog';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { differenceInDays, parseISO } from 'date-fns';
+import placeholderImages from '@/lib/placeholder-images.json';
+
 
 type AppState = {
   transactions: AgriTransaction[];
@@ -41,16 +43,8 @@ const farmTips = [
 ];
 
 export default function LivestockSelectionPage() {
-  const dairyImage = {
-    imageUrl: "https://images.unsplash.com/photo-1570042707198-315f617c5a03?q=80&w=2070&auto=format&fit=crop",
-    description: "A dairy cow in a field",
-    imageHint: "dairy cow"
-  };
-  const poultryImage = {
-    imageUrl: "https://images.unsplash.com/photo-1582172749449-35b364455242?q=80&w=1932&auto=format&fit=crop",
-    description: "A chicken in a coop",
-    imageHint: "chicken poultry"
-  };
+  const dairyImage: PlaceholderImage = placeholderImages.dairy;
+  const poultryImage: PlaceholderImage = placeholderImages.poultry;
 
   const { transactions, settings, tasks, dispatch } = useAppContext();
   const { toast } = useToast();
