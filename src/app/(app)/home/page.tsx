@@ -21,6 +21,7 @@ import {
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { differenceInDays, parseISO } from 'date-fns';
 import placeholderImages from '@/lib/placeholder-images.json';
+import { cn } from '@/lib/utils';
 
 
 type AppState = {
@@ -153,7 +154,10 @@ export default function LivestockSelectionPage() {
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-background to-secondary/50 p-4 sm:p-6">
       <div className="w-full max-w-4xl text-center">
-        <h1 className="font-headline text-4xl font-bold tracking-tight text-primary sm:text-5xl md:text-6xl">
+        <h1 className={cn(
+          "animate-text-gradient bg-gradient-to-r from-primary via-accent to-primary bg-clip-text font-headline text-4xl font-black tracking-tight text-transparent sm:text-5xl md:text-6xl",
+          "bg-[200%_auto]"
+        )}>
           Welcome to Agri Finance
         </h1>
         <p className="mt-4 text-lg text-foreground/80 sm:text-xl">
@@ -166,7 +170,7 @@ export default function LivestockSelectionPage() {
       <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
         {selectionOptions.map((option) => (
           <Link href={option.href} key={option.type}>
-            <Card className="group transform-gpu overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out hover:border-primary hover:shadow-lg hover:scale-105">
+            <Card className="group transform-gpu overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out hover:border-primary hover:shadow-xl hover:scale-105 hover:shadow-primary/20">
                {/* Desktop View Card */}
               <CardContent className="relative hidden p-0 md:block">
                 {option.image && (
@@ -253,15 +257,10 @@ export default function LivestockSelectionPage() {
                 </div>
                  <Dialog>
                     <DialogTrigger asChild>
-                        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border p-4 cursor-pointer hover:bg-muted/50 transition-colors">
-                           <Button>
-                               <LogIn className="mr-2 h-4 w-4" />
-                               Login to Sync
-                           </Button>
-                           <p className="text-xs text-muted-foreground text-center mt-2">
-                               Sync your data across multiple devices.
-                           </p>
-                        </div>
+                       <Button variant="ghost">
+                           <LogIn className="mr-2 h-4 w-4" />
+                           Login to Sync
+                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
@@ -287,3 +286,5 @@ export default function LivestockSelectionPage() {
     </main>
   );
 }
+
+    
