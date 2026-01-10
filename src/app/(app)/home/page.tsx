@@ -139,13 +139,11 @@ export default function LivestockSelectionPage() {
       type: 'Dairy',
       href: '/dashboard/dairy',
       description: 'Manage finances for your dairy cows and milk production.',
-      image: imageData.dairy,
     },
     {
       type: 'Poultry',
       href: '/dashboard/poultry',
       description: 'Track expenses and income for your egg-laying flock.',
-      image: imageData.poultry,
     },
   ];
 
