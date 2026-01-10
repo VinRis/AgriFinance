@@ -194,7 +194,7 @@ export default function LivestockSelectionPage() {
                     </div>
                   </div>
                 )}
-                <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4">
                     <Button onClick={handleBackup}>
                         <Download className="mr-2 h-4 w-4" />
                         Backup Data
@@ -210,28 +210,28 @@ export default function LivestockSelectionPage() {
                         accept="application/json"
                         className="hidden"
                     />
+                     <Dialog>
+                        <DialogTrigger asChild>
+                           <Button variant="ghost">
+                               <LogIn className="mr-2 h-4 w-4" />
+                               Login to Sync
+                           </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Coming Soon!</DialogTitle>
+                                <DialogDescription>
+                                    We are working hard to bring you cloud synchronization. This feature will allow you to access your farm data from any device, anywhere. Stay tuned for updates!
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button>OK</Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-                 <Dialog>
-                    <DialogTrigger asChild>
-                       <Button variant="ghost">
-                           <LogIn className="mr-2 h-4 w-4" />
-                           Login to Sync
-                       </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Coming Soon!</DialogTitle>
-                            <DialogDescription>
-                                We are working hard to bring you cloud synchronization. This feature will allow you to access your farm data from any device, anywhere. Stay tuned for updates!
-                            </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button>OK</Button>
-                            </DialogClose>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
             </div>
           </CardContent>
         </Card>
