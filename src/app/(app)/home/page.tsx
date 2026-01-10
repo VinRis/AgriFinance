@@ -1,12 +1,11 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Download, Upload, Lightbulb, Cloud, LogIn, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { AgriTransaction, AppSettings, FarmTask, PlaceholderImage } from '@/lib/types';
+import { AgriTransaction, AppSettings, FarmTask } from '@/lib/types';
 import React, { useRef, useState, useEffect } from 'react';
 import {
   Dialog,
@@ -21,8 +20,6 @@ import {
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
-import imageData from '@/lib/placeholder-images.json';
-
 
 type AppState = {
   transactions: AgriTransaction[];
