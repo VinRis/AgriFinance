@@ -21,6 +21,7 @@ import {
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
+import imageData from '@/lib/placeholder-images.json';
 
 
 type AppState = {
@@ -138,11 +139,13 @@ export default function LivestockSelectionPage() {
       type: 'Dairy',
       href: '/dashboard/dairy',
       description: 'Manage finances for your dairy cows and milk production.',
+      image: imageData.dairy,
     },
     {
       type: 'Poultry',
       href: '/dashboard/poultry',
       description: 'Track expenses and income for your egg-laying flock.',
+      image: imageData.poultry,
     },
   ];
 
@@ -165,13 +168,26 @@ export default function LivestockSelectionPage() {
       <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
         {selectionOptions.map((option) => (
           <Link href={option.href} key={option.type}>
-            <Card className="group transform-gpu overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out hover:border-primary hover:shadow-xl hover:scale-105 hover:shadow-primary/20">
-              <CardContent className="p-6 text-center">
-                  <h2 className="font-headline text-3xl font-bold text-primary">{option.type}</h2>
-                  <p className="mt-2 text-muted-foreground">{option.description}</p>
-                  <div className="mt-4 flex items-center justify-center text-primary group-hover:text-accent">
-                    <span className="font-semibold">Get Started</span>
-                    <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />
+            <Card className="group transform-gpu overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out">
+              <CardContent className="p-0 text-center">
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image
+                      src={option.image.imageUrl}
+                      alt={option.image.description}
+                      width={600}
+                      height={400}
+                      data-ai-hint={option.image.imageHint}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  </div>
+                  <div className="p-6">
+                    <h2 className="font-headline text-3xl font-bold text-primary">{option.type}</h2>
+                    <p className="mt-2 text-muted-foreground">{option.description}</p>
+                    <div className="mt-4 flex items-center justify-center text-primary group-hover:text-accent">
+                      <span className="font-semibold">Get Started</span>
+                      <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />
+                    </div>
                   </div>
               </CardContent>
             </Card>
