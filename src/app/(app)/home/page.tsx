@@ -151,7 +151,7 @@ export default function LivestockSelectionPage() {
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-background to-secondary/50 p-4 sm:p-6">
       <div className="w-full max-w-4xl text-center">
-         <h1 className="bg-[200%_auto] bg-clip-text font-headline text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl">
+        <h1 className="animate-text-gradient from-primary via-accent to-primary bg-clip-text font-headline text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-[200%_auto]">
           Welcome to Agri Finance
         </h1>
         <p className="mt-4 text-lg text-foreground/80 sm:text-xl">
@@ -163,12 +163,13 @@ export default function LivestockSelectionPage() {
       </div>
       <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
         {selectionOptions.map((option) => (
-          <Link href={option.href} key={option.type}>
-            <Card className="group relative transform-gpu overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out text-white">
+          <Link href={option.href} key={option.type} className="block relative h-60">
+            <Card className="group h-full overflow-hidden text-white">
               <Image
                 src={option.image.imageUrl}
                 alt={option.image.description}
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 data-ai-hint={option.image.imageHint}
               />
