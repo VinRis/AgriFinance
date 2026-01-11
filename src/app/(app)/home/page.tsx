@@ -163,7 +163,7 @@ export default function LivestockSelectionPage() {
           Select your enterprise to begin
         </p>
       </div>
-      <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mt-10 grid w-full max-w-3xl grid-cols-2 gap-4 md:gap-6">
         {selectionOptions.map((option) => (
           <Link
             href={option.href}
@@ -171,15 +171,15 @@ export default function LivestockSelectionPage() {
             className="group block"
           >
             <Card className="h-full overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
-              <CardContent className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-                <div className={cn("rounded-full p-4", option.bgClasses)}>
-                    <option.icon className={cn("h-12 w-12", option.iconClasses)} />
+              <CardContent className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center">
+                <div className={cn("rounded-full p-3", option.bgClasses)}>
+                    <option.icon className={cn("h-8 w-8 md:h-10 md:w-10", option.iconClasses)} />
                 </div>
-                <h2 className="font-headline text-3xl font-bold">{option.type}</h2>
-                <p className="mt-2 text-foreground/80">{option.description}</p>
-                <div className="mt-4 flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="font-semibold">Get Started</span>
-                  <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />
+                <h2 className="font-headline text-xl md:text-2xl font-bold">{option.type}</h2>
+                <p className="mt-1 text-xs sm:text-sm text-foreground/80">{option.description}</p>
+                <div className="mt-2 flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-sm font-semibold">Get Started</span>
+                  <ArrowRight className="ml-1 h-4 w-4 transform transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </CardContent>
             </Card>
