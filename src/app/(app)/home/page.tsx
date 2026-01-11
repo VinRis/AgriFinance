@@ -1,14 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Download, Upload, Lightbulb, LogIn, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Download, Upload, Lightbulb, LogIn, AlertTriangle, Milk, Bird } from 'lucide-react';
 import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { AgriTransaction, AppSettings, FarmTask } from '@/lib/types';
 import React, { useRef, useState, useEffect } from 'react';
-import Image from 'next/image';
-import placeholderImages from '@/lib/placeholder-images.json';
 import {
   Dialog,
   DialogClose,
@@ -137,13 +135,13 @@ export default function LivestockSelectionPage() {
       type: 'Dairy',
       href: '/dashboard/dairy',
       description: 'Manage finances for your dairy cows and milk production.',
-      image: placeholderImages.dairy
+      icon: Milk,
     },
     {
       type: 'Poultry',
       href: '/dashboard/poultry',
       description: 'Track expenses and income for your egg-laying flock.',
-      image: placeholderImages.poultry
+      icon: Bird,
     },
   ];
 
@@ -167,19 +165,12 @@ export default function LivestockSelectionPage() {
             key={option.type}
             className="group block"
           >
-            <Card className="relative h-48 overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
-              <Image
-                src={option.image.imageUrl}
-                alt={option.image.description}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint={option.image.imageHint}
-              />
-              <div className="absolute inset-0 bg-black/50" />
-              <CardContent className="relative z-10 flex h-full flex-col items-center justify-center p-6 text-center text-white">
+            <Card className="h-48 overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+                <option.icon className="h-12 w-12 text-primary" />
                 <h2 className="font-headline text-3xl font-bold">{option.type}</h2>
-                <p className="mt-2 text-white/90">{option.description}</p>
-                <div className="mt-4 flex items-center justify-center">
+                <p className="mt-2 text-foreground/80">{option.description}</p>
+                <div className="mt-4 flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="font-semibold">Get Started</span>
                   <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
