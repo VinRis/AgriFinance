@@ -12,13 +12,13 @@ export default function OfflinePage() {
           You Are Offline
         </h1>
         <p className="mt-4 text-lg text-foreground/80">
-          It looks like you've lost your connection. This app has offline capabilities, but the page you requested isn't available right now.
+          It looks like you've lost your connection. The page you requested isn't available right now.
         </p>
         <p className="mt-2 text-foreground/80">
-          Please check your connection or try returning to the home page.
+          Pages you have already visited should be available. Please check your connection or try returning to the home page.
         </p>
         <Button asChild className="mt-8">
-          <Link href="/">Go to Homepage</Link>
+          <Link href="/home">Go to Homepage</Link>
         </Button>
       </div>
     </main>
