@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { differenceInDays, parseISO } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type AppState = {
   transactions: AgriTransaction[];
@@ -136,12 +137,16 @@ export default function LivestockSelectionPage() {
       href: '/dashboard/dairy',
       description: 'Manage finances for your dairy cows and milk production.',
       icon: Milk,
+      iconClasses: 'text-blue-500',
+      bgClasses: 'bg-blue-50 dark:bg-blue-900/30'
     },
     {
       type: 'Poultry',
       href: '/dashboard/poultry',
       description: 'Track expenses and income for your egg-laying flock.',
       icon: Bird,
+      iconClasses: 'text-amber-500',
+      bgClasses: 'bg-amber-50 dark:bg-amber-900/30'
     },
   ];
 
@@ -165,9 +170,11 @@ export default function LivestockSelectionPage() {
             key={option.type}
             className="group block"
           >
-            <Card className="h-48 overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
+            <Card className="h-full overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
               <CardContent className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-                <option.icon className="h-12 w-12 text-primary" />
+                <div className={cn("rounded-full p-4", option.bgClasses)}>
+                    <option.icon className={cn("h-12 w-12", option.iconClasses)} />
+                </div>
                 <h2 className="font-headline text-3xl font-bold">{option.type}</h2>
                 <p className="mt-2 text-foreground/80">{option.description}</p>
                 <div className="mt-4 flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity">
