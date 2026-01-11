@@ -162,25 +162,27 @@ export default function LivestockSelectionPage() {
       </div>
       <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
         {selectionOptions.map((option) => (
-          <Link href={option.href} key={option.type}>
-            <Card className="group relative h-48 overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
-              <Image
-                src={option.image.imageUrl}
-                alt={option.image.description}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint={option.image.imageHint}
-              />
-              <div className="absolute inset-0 bg-black/50" />
-              <CardContent className="relative z-10 p-6 text-center flex flex-col justify-center items-center h-full text-white">
+          <Link href={option.href} key={option.type} legacyBehavior>
+            <a className="group block">
+              <Card className="relative h-48 overflow-hidden rounded-lg hover:shadow-lg transition-shadow duration-300">
+                <Image
+                  src={option.image.imageUrl}
+                  alt={option.image.description}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  data-ai-hint={option.image.imageHint}
+                />
+                <div className="absolute inset-0 bg-black/50" />
+                <CardContent className="relative z-10 p-6 flex flex-col justify-center items-center h-full text-white text-center">
                   <h2 className="font-headline text-3xl font-bold">{option.type}</h2>
                   <p className="mt-2 text-white/90">{option.description}</p>
                   <div className="mt-4 flex items-center justify-center">
                     <span className="font-semibold">Get Started</span>
                     <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </a>
           </Link>
         ))}
       </div>
