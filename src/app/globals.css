@@ -31,18 +31,6 @@
     --chart-5: 340 75% 55%;
   }
 
-  /* Dairy Theme Override */
-  .theme-dairy {
-    --primary: 221 83% 53%; /* Blue */
-    --ring: 221 83% 53%;
-  }
-
-  /* Poultry Theme Override */
-  .theme-poultry {
-    --primary: 38 92% 50%; /* Amber/Gold */
-    --ring: 38 92% 50%;
-  }
-
   .dark {
     --background: 222 84% 5%;
     --foreground: 210 40% 98%;
@@ -63,6 +51,28 @@
     --border: 215 28% 17%;
     --input: 215 28% 17%;
     --ring: 217 91% 60%;
+  }
+
+  /* Theme Overrides - Explicitly handle light and dark mode for each theme */
+  
+  /* Dairy Theme (Blue) */
+  .theme-dairy {
+    --primary: 221 83% 53%;
+    --ring: 221 83% 53%;
+  }
+  .dark.theme-dairy {
+    --primary: 217 91% 60%;
+    --ring: 217 91% 60%;
+  }
+
+  /* Poultry Theme (Amber) */
+  .theme-poultry {
+    --primary: 38 92% 50%;
+    --ring: 38 92% 50%;
+  }
+  .dark.theme-poultry {
+    --primary: 38 92% 60%;
+    --ring: 38 92% 60%;
   }
 }
 
