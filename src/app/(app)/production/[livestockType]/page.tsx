@@ -109,12 +109,24 @@ export default function ProductionPage() {
   const unit = livestockType === 'dairy' ? 'L' : 'Trays';
   const Icon = livestockType === 'dairy' ? Milk : Egg;
 
+  const currentSummaryValue = useMemo(() => {
+    if (timeFilter === 'week') return stats.thisWeek;
+    if (timeFilter === 'month') return stats.thisMonth;
+    return stats.allTime;
+  }, [stats, timeFilter]);
+
+  const currentSummaryLabel = useMemo(() => {
+    if (timeFilter === 'week') return 'this week';
+    if (timeFilter === 'month') return 'this month';
+    return 'all time';
+  }, [timeFilter]);
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
       <div className="text-center space-y-2">
         <p className="text-sm text-muted-foreground uppercase tracking-widest">Total Production</p>
         <h2 className="text-4xl font-bold">
-          {stats.thisMonth.toLocaleString()} <span className="text-xl font-normal text-muted-foreground">{unit} this month</span>
+          {currentSummaryValue.toLocaleString()} <span className="text-xl font-normal text-muted-foreground">{unit} {currentSummaryLabel}</span>
         </h2>
       </div>
 
