@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { notFound, usePathname } from 'next/navigation';
@@ -8,6 +9,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { getAdvisorTips } from '@/ai/flows/advisor-flow';
 import { LivestockType } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 export default function AdvisorPage() {
   const pathname = usePathname();
@@ -127,5 +129,3 @@ export default function AdvisorPage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';
