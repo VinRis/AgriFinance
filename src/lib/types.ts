@@ -32,6 +32,15 @@ export interface FarmTask {
   reminder: boolean;
 }
 
+export interface ProductionRecord {
+  id: string;
+  date: string; // ISO string
+  livestockType: LivestockType;
+  amount: number;
+  unit: string; // Liters for Dairy, Trays/Eggs for Poultry
+  notes?: string;
+}
+
 export interface PlaceholderImage {
     imageUrl: string;
     description: string;
