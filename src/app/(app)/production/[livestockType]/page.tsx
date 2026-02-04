@@ -107,7 +107,7 @@ export default function ProductionPage() {
     setSelectedRecord(null);
   };
 
-  const unit = livestockType === 'dairy' ? 'L' : 'Trays';
+  const unit = livestockType === 'dairy' ? 'L' : 'Eggs';
   const Icon = livestockType === 'dairy' ? Milk : Egg;
 
   const currentSummaryValue = useMemo(() => {

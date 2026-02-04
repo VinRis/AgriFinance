@@ -33,7 +33,7 @@ const formSchema = z.object({
 export function ProductionForm({ livestockType, isOpen, onClose, record }: ProductionFormProps) {
   const { dispatch } = useAppContext();
   const { toast } = useToast();
-  const unit = livestockType === 'dairy' ? 'Liters' : 'Trays';
+  const unit = livestockType === 'dairy' ? 'Liters' : 'Eggs';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -166,7 +166,7 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Amount ({unit})</FormLabel>
-                      <FormControl><Input type="number" step="0.1" {...field} /></FormControl>
+                      <FormControl><Input type="number" step="1" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
