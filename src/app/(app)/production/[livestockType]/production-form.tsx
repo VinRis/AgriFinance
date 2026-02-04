@@ -11,6 +11,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose }
 import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, ProductionRecord } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 type ProductionFormProps = {
   livestockType: LivestockType;
@@ -65,9 +67,21 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
     onClose();
   };
 
+  const handleDelete = () => {
+    if (record) {
+        dispatch({ type: 'DELETE_PRODUCTION', payload: record.id });
+        toast({
+            variant: 'destructive',
+            title: 'Record Deleted',
+            description: 'The production record has been removed.',
+        });
+        onClose();
+    }
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-lg w-[90vw]">
+      <SheetContent className="sm:max-w-lg w-[90vw] overflow-y-auto">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
             <SheetHeader>
@@ -102,15 +116,43 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Notes</FormLabel>
-                    <FormControl><Textarea placeholder="Any observations?" {...field} /></FormControl>
+                    <FormControl><Textarea placeholder="Any observations about health or quality?" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            <SheetFooter>
-                <SheetClose asChild><Button variant="outline">Cancel</Button></SheetClose>
+            <SheetFooter className="grid grid-cols-2 gap-2 sm:flex sm:justify-between sm:w-full">
+               {record && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="destructive" className="sm:w-auto">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this production record.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                        Yes, delete it
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              <div className="flex gap-2 justify-end col-start-2 sm:col-start-auto">
+                <SheetClose asChild>
+                  <Button type="button" variant="outline">Cancel</Button>
+                </SheetClose>
                 <Button type="submit">Save Record</Button>
+              </div>
             </SheetFooter>
           </form>
         </Form>
