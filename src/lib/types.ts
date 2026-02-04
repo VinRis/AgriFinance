@@ -38,6 +38,7 @@ export interface ProductionRecord {
   livestockType: LivestockType;
   amount: number;
   unit: string; // Liters for Dairy, Trays/Eggs for Poultry
+  collectionTime?: 'morning' | 'noon' | 'evening';
   notes?: string;
 }
 

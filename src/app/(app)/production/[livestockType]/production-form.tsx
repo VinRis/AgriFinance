@@ -11,8 +11,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose }
 import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, ProductionRecord } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Sun, Sunset, Moon } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 type ProductionFormProps = {
   livestockType: LivestockType;
@@ -24,6 +26,7 @@ type ProductionFormProps = {
 const formSchema = z.object({
   date: z.string().min(1, 'A date is required.'),
   amount: z.coerce.number().min(0.1, 'Amount must be greater than 0.'),
+  collectionTime: z.enum(['morning', 'noon', 'evening']).optional(),
   notes: z.string().optional(),
 });
 
@@ -36,14 +39,14 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
     resolver: zodResolver(formSchema),
     defaultValues: record
       ? { ...record, date: record.date.split('T')[0] }
-      : { amount: 0, date: new Date().toISOString().split('T')[0], notes: '' },
+      : { amount: 0, date: new Date().toISOString().split('T')[0], notes: '', collectionTime: 'morning' },
   });
 
   useEffect(() => {
     if (isOpen) {
        form.reset(record
         ? { ...record, date: record.date.split('T')[0] }
-        : { amount: 0, notes: '', date: new Date().toISOString().split('T')[0] }
+        : { amount: 0, notes: '', date: new Date().toISOString().split('T')[0], collectionTime: 'morning' }
       );
     }
   }, [isOpen, record, form]);
@@ -87,7 +90,7 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
             <SheetHeader>
               <SheetTitle>{record ? 'Edit' : 'Add'} Production</SheetTitle>
             </SheetHeader>
-            <div className="flex-1 py-6 space-y-4">
+            <div className="flex-1 py-6 space-y-6">
               <FormField
                   control={form.control}
                   name="date"
@@ -99,6 +102,64 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
                     </FormItem>
                   )}
               />
+              
+              {livestockType === 'dairy' && (
+                <FormField
+                  control={form.control}
+                  name="collectionTime"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>Collection Time</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex gap-2"
+                        >
+                          <FormItem className="flex-1">
+                            <FormControl className="sr-only">
+                              <RadioGroupItem value="morning" />
+                            </FormControl>
+                            <FormLabel className={cn(
+                              "flex flex-col items-center justify-center gap-2 rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
+                              field.value === 'morning' && "border-primary"
+                            )}>
+                              <Sun className="h-5 w-5" />
+                              <span className="text-xs font-semibold">Morning</span>
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex-1">
+                            <FormControl className="sr-only">
+                              <RadioGroupItem value="noon" />
+                            </FormControl>
+                            <FormLabel className={cn(
+                              "flex flex-col items-center justify-center gap-2 rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
+                              field.value === 'noon' && "border-primary"
+                            )}>
+                              <Sunset className="h-5 w-5" />
+                              <span className="text-xs font-semibold">Noon</span>
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex-1">
+                            <FormControl className="sr-only">
+                              <RadioGroupItem value="evening" />
+                            </FormControl>
+                            <FormLabel className={cn(
+                              "flex flex-col items-center justify-center gap-2 rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
+                              field.value === 'evening' && "border-primary"
+                            )}>
+                              <Moon className="h-5 w-5" />
+                              <span className="text-xs font-semibold">Evening</span>
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               <FormField
                   control={form.control}
                   name="amount"

@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { notFound, usePathname } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Milk, Egg, FlaskConical, Plus, Search, TrendingUp, Calendar, History } from 'lucide-react';
+import { Milk, Egg, FlaskConical, Plus, Search, TrendingUp, Calendar, History, Sun, Sunset, Moon } from 'lucide-react';
 import { LivestockType, ProductionRecord } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { ProductionForm } from './production-form';
@@ -75,7 +75,8 @@ export default function ProductionPage() {
       const query = searchQuery.toLowerCase();
       records = records.filter(r => 
         (r.notes?.toLowerCase().includes(query)) || 
-        (format(parseISO(r.date), 'MMMM d, yyyy').toLowerCase().includes(query))
+        (format(parseISO(r.date), 'MMMM d, yyyy').toLowerCase().includes(query)) ||
+        (r.collectionTime?.toLowerCase().includes(query))
       );
     }
 
@@ -120,6 +121,15 @@ export default function ProductionPage() {
     if (timeFilter === 'month') return 'this month';
     return 'all time';
   }, [timeFilter]);
+
+  const getCollectionIcon = (time?: string) => {
+    switch (time) {
+      case 'morning': return <Sun className="h-3 w-3 inline mr-1 text-yellow-500" />;
+      case 'noon': return <Sunset className="h-3 w-3 inline mr-1 text-orange-500" />;
+      case 'evening': return <Moon className="h-3 w-3 inline mr-1 text-blue-500" />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-3">
@@ -193,7 +203,7 @@ export default function ProductionPage() {
         <div className="flex items-center justify-between px-1">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Recent Production
+            Recent Activity
           </h3>
         </div>
 
@@ -210,7 +220,15 @@ export default function ProductionPage() {
                           <Icon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="font-bold text-lg">{r.amount} {r.unit}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold text-lg">{r.amount} {r.unit}</p>
+                            {r.collectionTime && (
+                              <span className="text-xs text-muted-foreground capitalize bg-muted px-2 py-0.5 rounded-full flex items-center">
+                                {getCollectionIcon(r.collectionTime)}
+                                {r.collectionTime}
+                              </span>
+                            )}
+                          </div>
                           {r.notes && <p className="text-sm text-muted-foreground italic truncate max-w-[200px]">"{r.notes}"</p>}
                         </div>
                       </div>
