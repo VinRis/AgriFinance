@@ -40,6 +40,12 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: 'Expense',
         description: 'Record a farm expense',
         url: '/finances/dairy',
+      },
+      {
+        name: 'View Reports',
+        short_name: 'Reports',
+        description: 'View financial and production reports',
+        url: '/reports/dairy',
       }
     ]
   }

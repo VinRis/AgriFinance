@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings, Home, CalendarDays, FlaskConical, BrainCircuit, BookCopy } from 'lucide-react';
+import { LayoutDashboard, Settings, Home, CalendarDays, FlaskConical, BrainCircuit, BookCopy, PieChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
@@ -27,6 +27,7 @@ export function NavLinks() {
     { href: `/dashboard/${livestockType}`, icon: LayoutDashboard, label: 'Board' },
     { href: `/finances/${livestockType}`, icon: BookCopy, label: 'Cash' },
     { href: `/production/${livestockType}`, icon: FlaskConical, label: 'Produce' },
+    { href: `/reports/${livestockType}`, icon: PieChart, label: 'Reports' },
     { href: `/advisor/${livestockType}`, icon: BrainCircuit, label: 'AI Tips' },
     { href: `/tasks`, icon: CalendarDays, label: 'Tasks' },
     { href: `/settings`, icon: Settings, label: 'Tools' },
@@ -34,7 +35,7 @@ export function NavLinks() {
   
   return (
     <div className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background/95 backdrop-blur-sm p-2 no-print">
-      <div className="mx-auto grid max-w-2xl grid-cols-7 items-center justify-items-center gap-1">
+      <div className="mx-auto grid max-w-2xl grid-cols-8 items-center justify-items-center gap-1">
           <Link href="/home" className={cn('flex flex-col items-center justify-center text-muted-foreground w-full gap-1 p-2', pathname === '/home' && 'text-primary font-bold')}>
               <Home className="h-5 w-5" />
               <span className="text-[10px]">Home</span>

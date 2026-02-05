@@ -1,9 +1,9 @@
 'use client';
-import { notFound, usePathname } from 'next/navigation';
+import { notFound, usePathname, useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, AgriTransaction } from '@/lib/types';
-import { DollarSign, TrendingUp, TrendingDown, BookOpen, Lightbulb, Filter, Target } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, BookOpen, Lightbulb, Filter, Target, ArrowRight } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Pie, PieChart, Cell, Legend } from 'recharts';
 import { useMemo, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -89,12 +89,6 @@ function generateFinancialSummary(data: AggregatedData, currency: string): strin
     summary += `Your largest expense category is "${highestExpenseCategory.name}" at ${formatCurrency(highestExpenseCategory.value, currency)}. `;
   }
 
-  if (netProfit > 0) {
-    summary += 'Keep up the great work!';
-  } else {
-    summary += 'Keep a close eye on your expenses to improve profitability.';
-  }
-
   return summary;
 }
 
@@ -111,6 +105,7 @@ const months = [
 
 export default function DashboardPage() {
   const pathname = usePathname();
+  const router = useRouter();
   const segments = pathname.split('/');
   const livestockType = segments[segments.length - 1] as LivestockType;
   
@@ -163,7 +158,6 @@ export default function DashboardPage() {
 
         switch (type) {
              case 'ytd':
-                 // Previous YTD is all of last year for simplicity
                 prevYear = year - 1;
                 return { type: 'year', year: prevYear, month: prevMonth };
             case 'year':
@@ -509,14 +503,22 @@ export default function DashboardPage() {
        <Card className="w-full">
           <CardHeader className="flex flex-row items-center gap-4 space-y-0">
             <Lightbulb className="h-6 w-6 text-primary" />
-            <div>
+            <div className="flex-1">
               <CardTitle>Financial Snapshot</CardTitle>
               <CardDescription>A summary of your financial activity for the selected period.</CardDescription>
             </div>
+            <Button variant="ghost" size="sm" onClick={() => router.push(`/reports/${livestockType}`)} className="hidden sm:flex">
+              View Reports <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent>
             {isHydrated ? (
-              <p className="text-sm text-foreground/90 whitespace-pre-line">{financialSummary}</p>
+              <div className="space-y-4">
+                <p className="text-sm text-foreground/90 whitespace-pre-line">{financialSummary}</p>
+                <Button variant="outline" size="sm" className="w-full sm:hidden" onClick={() => router.push(`/reports/${livestockType}`)}>
+                   Full Reports <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             ) : <Skeleton className="h-16 w-full" />}
           </CardContent>
         </Card>
