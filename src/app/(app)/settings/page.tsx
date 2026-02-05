@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LifeBuoy, MessageSquare, Phone, ShoppingCart, PieChart, ChevronRight, Milk, Bird } from 'lucide-react';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 const settingsSchema = z.object({
   farmName: z.string().min(1, 'Farm name is required'),
@@ -42,6 +43,7 @@ const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function SettingsPage() {
   const { settings, dispatch } = useAppContext();
   const { toast } = useToast();
+  const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -149,24 +151,27 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="grid gap-2">
-                    <Button variant="outline" className="w-full justify-between" asChild>
-                        <Link href="/reports/dairy">
-                            <div className="flex items-center gap-2">
-                                <Milk className="h-4 w-4 text-blue-500" />
-                                <span>Dairy Reports</span>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        </Link>
-                    </Button>
-                    <Button variant="outline" className="w-full justify-between" asChild>
-                        <Link href="/reports/poultry">
-                            <div className="flex items-center gap-2">
-                                <Bird className="h-4 w-4 text-amber-500" />
-                                <span>Poultry Reports</span>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        </Link>
-                    </Button>
+                    {lastSelectedType === 'dairy' ? (
+                      <Button variant="outline" className="w-full justify-between" asChild>
+                          <Link href="/reports/dairy">
+                              <div className="flex items-center gap-2">
+                                  <Milk className="h-4 w-4 text-blue-500" />
+                                  <span>Dairy Reports</span>
+                              </div>
+                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          </Link>
+                      </Button>
+                    ) : (
+                      <Button variant="outline" className="w-full justify-between" asChild>
+                          <Link href="/reports/poultry">
+                              <div className="flex items-center gap-2">
+                                  <Bird className="h-4 w-4 text-amber-500" />
+                                  <span>Poultry Reports</span>
+                              </div>
+                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          </Link>
+                      </Button>
+                    )}
                 </div>
             </CardContent>
         </Card>
