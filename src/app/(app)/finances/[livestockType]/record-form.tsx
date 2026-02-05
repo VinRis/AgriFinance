@@ -198,36 +198,38 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
                 )}
               />
             </div>
-            <SheetFooter className="grid grid-cols-2 gap-2 sm:flex sm:justify-between sm:w-full">
-              {transaction && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button type="button" variant="destructive" className="sm:w-auto">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete this transaction from your records.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-                        Yes, delete it
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
-              <div className="flex gap-2 justify-end col-start-2 sm:col-start-auto">
+            <SheetFooter className="flex flex-col-reverse sm:flex-row sm:justify-between gap-4 mt-6">
+              <div className="flex flex-col sm:flex-row gap-2">
+                {transaction && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button type="button" variant="destructive" className="w-full sm:w-auto">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete this transaction from your records.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                          Yes, delete it
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <SheetClose asChild>
-                  <Button type="button" variant="outline">Cancel</Button>
+                  <Button type="button" variant="outline" className="w-full sm:w-auto">Cancel</Button>
                 </SheetClose>
-                <Button type="submit">Save</Button>
+                <Button type="submit" className="w-full sm:w-auto">Save</Button>
               </div>
             </SheetFooter>
           </form>
