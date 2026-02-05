@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Trash2, Sun, Sunset, Moon } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { cn } from '@/lib/utils';
+import { cn, vibrate } from '@/lib/utils';
 
 type ProductionFormProps = {
   livestockType: LivestockType;
@@ -67,6 +67,7 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
       dispatch({ type: 'ADD_PRODUCTION', payload: recordData as ProductionRecord });
       toast({ title: 'Record Added', description: 'Daily production logged!' });
     }
+    vibrate(30);
     onClose();
   };
 
@@ -78,6 +79,7 @@ export function ProductionForm({ livestockType, isOpen, onClose, record }: Produ
             title: 'Record Deleted',
             description: 'The production record has been removed.',
         });
+        vibrate([50, 50, 50]);
         onClose();
     }
   };

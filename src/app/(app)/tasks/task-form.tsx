@@ -12,7 +12,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { FarmTask, LivestockType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Bird, Milk, Wrench, Siren, Bell } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, vibrate } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 
@@ -102,6 +102,8 @@ export function TaskForm({ isOpen, onClose, task, selectedDate }: TaskFormProps)
       dispatch({ type: 'ADD_TASK', payload: taskData as FarmTask });
       toast({ title: 'Task Added', description: 'A new task has been scheduled.' });
     }
+
+    vibrate(30);
 
     if (data.reminder) {
         if ('Notification' in window && Notification.permission === 'granted') {

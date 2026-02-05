@@ -4,9 +4,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { LivestockType, AgriTransaction, AppSettings } from '@/lib/types';
 import { useAppContext } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
-import { Download, Printer } from 'lucide-react';
+import { Download, Printer, Share2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Bar, BarChart, XAxis, YAxis, Tooltip, Legend, Pie, PieChart, Cell } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -44,6 +44,11 @@ export default function ReportsPage() {
   const { getTransactions, settings } = useAppContext();
   const { toast } = useToast();
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [canShare, setCanShare] = useState(false);
+
+  useEffect(() => {
+    setCanShare(typeof navigator !== 'undefined' && !!navigator.share);
+  }, []);
 
   if (livestockType !== 'dairy' && livestockType !== 'poultry') {
     notFound();
@@ -140,38 +145,28 @@ export default function ReportsPage() {
     document.body.removeChild(link);
   };
   
-  const generatePnlCSV = () => {
-    if (pnlData.length === 0) {
-        toast({
-            variant: "destructive",
-            title: "No Data to Export",
-            description: "There are no P&L transactions for the selected year.",
-        });
-        return;
-    }
-    const headers = Object.keys(pnlData[0] || {}).join(',');
-    const csv = [
-      headers,
-      ...pnlData.map(row =>
-        Object.values(row).map(value => JSON.stringify(value, (_, val) => val ?? '')).join(',')
-      )
-    ].join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.href) {
-      URL.revokeObjectURL(link.href);
-    }
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.setAttribute('download', `${livestockType}-pnl-report-${selectedYear}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleShare = async () => {
+    if (!navigator.share) return;
+
+    const summary = `${settings.farmName} ${livestockType.toUpperCase()} Report ${selectedYear}\n\n` +
+      `Total Revenue: ${formatCurrency(aggregatedData.totalRevenue, settings.currency)}\n` +
+      `Total Expenses: ${formatCurrency(aggregatedData.totalExpenses, settings.currency)}\n` +
+      `Net Profit: ${formatCurrency(aggregatedData.netProfit, settings.currency)}\n\n` +
+      `Managed by: ${settings.managerName}`;
+
+    try {
+      await navigator.share({
+        title: `${settings.farmName} Report`,
+        text: summary,
+        url: window.location.href
+      });
+    } catch (error) {
+      console.error('Sharing failed', error);
+    }
   };
   
   const generateReportSummary = (data: AggregatedData, currency: string, year: number): string => {
@@ -239,16 +234,22 @@ export default function ReportsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-6">Use the buttons below to export a full CSV of all transactions or print a professional financial summary for the selected year.</p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <p className="text-sm text-muted-foreground mb-6">Use the buttons below to export a full CSV of all transactions or print/share a professional financial summary for the selected year.</p>
+              <div className="flex flex-wrap gap-4">
                   <Button onClick={generateFullReportCSV} disabled={transactions.length === 0}>
                       <Download className="mr-2 h-4 w-4" />
-                      Export All as CSV
+                      Export CSV
                   </Button>
                   <Button onClick={handlePrint} variant="outline" disabled={yearlyTransactions.length === 0}>
                     <Printer className="mr-2 h-4 w-4" />
-                    Print Financial Summary
+                    Print Summary
                   </Button>
+                  {canShare && (
+                    <Button onClick={handleShare} variant="secondary" disabled={yearlyTransactions.length === 0}>
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Share Report
+                    </Button>
+                  )}
               </div>
             </CardContent>
           </Card>
@@ -277,12 +278,6 @@ export default function ReportsPage() {
                     </div>
                 </div>
             </CardContent>
-            <CardFooter>
-                 <Button onClick={generatePnlCSV} disabled={pnlData.length === 0}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Export P&amp;L as CSV
-                </Button>
-            </CardFooter>
           </Card>
       </main>
         

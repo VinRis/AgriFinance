@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Trash2 } from 'lucide-react';
+import { vibrate } from '@/lib/utils';
 
 type RecordFormProps = {
   livestockType: LivestockType;
@@ -84,6 +85,7 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
       dispatch({ type: 'ADD_TRANSACTION', payload: transactionData as AgriTransaction });
       toast({ title: 'Transaction Added', description: 'A new transaction has been created.' });
     }
+    vibrate(30);
     onClose();
   };
 
@@ -95,6 +97,7 @@ export function RecordForm({ livestockType, isOpen, onClose, transaction }: Reco
             title: 'Transaction Deleted',
             description: 'The transaction has been removed.',
         });
+        vibrate([50, 50, 50]);
         onClose();
     }
   };
