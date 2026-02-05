@@ -1,6 +1,5 @@
-
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { NavLinks } from '@/components/layout/nav-links';
 import { Header } from '@/components/layout/header';
@@ -22,26 +21,31 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isFormOpen, setFormOpen] = useState(false);
   const segments = pathname.split('/');
   
-  const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
-  const pathLivestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
-  const livestockType = (pathLivestockType || lastSelectedType) as LivestockType;
+  const [lastSelectedType, setLastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
   
-  const showNav = !pathname.includes('/home');
+  // Detect livestock type from URL segments
+  const pathLivestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
+  
+  // Consolidate the active enterprise type
+  const activeEnterprise = (pathLivestockType || lastSelectedType) as LivestockType;
+
+  // Sync the last selected type to storage whenever we visit an enterprise-specific route
+  useEffect(() => {
+    if (pathLivestockType && pathLivestockType !== lastSelectedType) {
+      setLastSelectedType(pathLivestockType);
+    }
+  }, [pathLivestockType, lastSelectedType, setLastSelectedType]);
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('theme-dairy', 'theme-poultry');
     
-    // We only apply enterprise themes if we are NOT on the home page.
-    // This ensures the home page always retains its default blue accent color.
-    if (pathname !== '/home' && pathname !== '/') {
-      if (pathLivestockType) {
-        root.classList.add(`theme-${pathLivestockType}`);
-      } else if (lastSelectedType) {
-        root.classList.add(`theme-${lastSelectedType}`);
-      }
+    // Apply themes only when not on the landing/home pages
+    const isHome = pathname === '/home' || pathname === '/';
+    if (!isHome) {
+      root.classList.add(`theme-${activeEnterprise}`);
     }
-  }, [pathLivestockType, lastSelectedType, pathname]);
+  }, [activeEnterprise, pathname]);
 
   if (!isHydrated) {
     return (
@@ -58,14 +62,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const renderForm = () => {
     if (isTasksPage) return <TaskForm isOpen={isFormOpen} onClose={() => setFormOpen(false)} />;
-    if (isFinancesPage) return <RecordForm livestockType={livestockType} isOpen={isFormOpen} onClose={() => setFormOpen(false)} />;
-    if (isProductionPage) return <ProductionForm livestockType={livestockType} isOpen={isFormOpen} onClose={() => setFormOpen(false)} />;
+    if (isFinancesPage) return <RecordForm livestockType={activeEnterprise} isOpen={isFormOpen} onClose={() => setFormOpen(false)} />;
+    if (isProductionPage) return <ProductionForm livestockType={activeEnterprise} isOpen={isFormOpen} onClose={() => setFormOpen(false)} />;
     return null;
   }
 
   const fabClasses = cn(
     "fixed bottom-20 right-6 rounded-full shadow-lg z-20 no-print transition-all duration-300 h-16 w-16 bg-primary hover:opacity-90 flex items-center justify-center text-white"
   );
+
+  const showNav = pathname !== '/home';
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">

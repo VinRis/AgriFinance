@@ -1,28 +1,22 @@
-// NavLinks component with added Production and AI Advisor links
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookCopy, FileText, LayoutDashboard, Settings, Home, CalendarDays, FlaskConical, BrainCircuit } from 'lucide-react';
+import { LayoutDashboard, Settings, Home, CalendarDays, FlaskConical, BrainCircuit, BookCopy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useEffect } from 'react';
 
 export function NavLinks() {
   const pathname = usePathname();
   const segments = pathname.split('/');
-  const [lastSelectedType, setLastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
+  const [lastSelectedType] = useLocalStorage<string>('last-livestock-type', 'dairy');
   
+  // Detect if we are currently in a poultry or dairy path
   const pathLivestockType = segments.includes('dairy') ? 'dairy' : segments.includes('poultry') ? 'poultry' : null;
   
-  useEffect(() => {
-    if (pathLivestockType) {
-      setLastSelectedType(pathLivestockType);
-    }
-  }, [pathLivestockType, setLastSelectedType]);
+  // Use path type if available, otherwise fallback to stored preference
+  const livestockType = pathLivestockType || lastSelectedType;
 
   if (pathname === '/home' || pathname === '/login' || pathname === '/') return null;
-
-  const livestockType = pathLivestockType || lastSelectedType;
 
   const isNavItemActive = (href: string) => {
     const baseHref = href.split('?')[0];

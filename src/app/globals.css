@@ -59,20 +59,24 @@
   .theme-dairy {
     --primary: 221 83% 53%;
     --ring: 221 83% 53%;
+    --accent: 221 83% 90%;
   }
   .dark.theme-dairy {
     --primary: 217 91% 60%;
     --ring: 217 91% 60%;
+    --accent: 217 91% 20%;
   }
 
   /* Poultry Theme (Amber) */
   .theme-poultry {
     --primary: 38 92% 50%;
     --ring: 38 92% 50%;
+    --accent: 38 92% 90%;
   }
   .dark.theme-poultry {
     --primary: 38 92% 60%;
     --ring: 38 92% 60%;
+    --accent: 38 92% 20%;
   }
 }
 
