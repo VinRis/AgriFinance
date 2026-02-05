@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,7 @@ import { useAppContext } from '@/contexts/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LifeBuoy, MessageSquare, Phone, ShoppingCart } from 'lucide-react';
+import { LifeBuoy, MessageSquare, Phone, ShoppingCart, PieChart, ChevronRight, Milk, Bird } from 'lucide-react';
 
 const settingsSchema = z.object({
   farmName: z.string().min(1, 'Farm name is required'),
@@ -133,6 +134,42 @@ export default function SettingsPage() {
           </Card>
         </form>
        </Form>
+
+        <Card>
+            <CardHeader>
+                <div className="flex items-center gap-4">
+                    <PieChart className="h-6 w-6 text-primary" />
+                    <div>
+                        <CardTitle>Reports & Data</CardTitle>
+                        <CardDescription>
+                            Access detailed financial summaries and export your records.
+                        </CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid gap-2">
+                    <Button variant="outline" className="w-full justify-between" asChild>
+                        <Link href="/reports/dairy">
+                            <div className="flex items-center gap-2">
+                                <Milk className="h-4 w-4 text-blue-500" />
+                                <span>Dairy Reports</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </Link>
+                    </Button>
+                    <Button variant="outline" className="w-full justify-between" asChild>
+                        <Link href="/reports/poultry">
+                            <div className="flex items-center gap-2">
+                                <Bird className="h-4 w-4 text-amber-500" />
+                                <span>Poultry Reports</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
 
         <Card>
             <CardHeader>

@@ -3,7 +3,7 @@ import { notFound, usePathname, useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { useAppContext } from '@/contexts/app-context';
 import { LivestockType, AgriTransaction } from '@/lib/types';
-import { DollarSign, TrendingUp, TrendingDown, BookOpen, Lightbulb, Filter, Target, ArrowRight } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, BookOpen, Lightbulb, Filter, Target } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Pie, PieChart, Cell, Legend } from 'recharts';
 import { useMemo, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,7 +105,6 @@ const months = [
 
 export default function DashboardPage() {
   const pathname = usePathname();
-  const router = useRouter();
   const segments = pathname.split('/');
   const livestockType = segments[segments.length - 1] as LivestockType;
   
@@ -507,17 +506,11 @@ export default function DashboardPage() {
               <CardTitle>Financial Snapshot</CardTitle>
               <CardDescription>A summary of your financial activity for the selected period.</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => router.push(`/reports/${livestockType}`)} className="hidden sm:flex">
-              View Reports <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </CardHeader>
           <CardContent>
             {isHydrated ? (
               <div className="space-y-4">
                 <p className="text-sm text-foreground/90 whitespace-pre-line">{financialSummary}</p>
-                <Button variant="outline" size="sm" className="w-full sm:hidden" onClick={() => router.push(`/reports/${livestockType}`)}>
-                   Full Reports <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
               </div>
             ) : <Skeleton className="h-16 w-full" />}
           </CardContent>
