@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
@@ -30,12 +31,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('theme-dairy', 'theme-poultry');
-    if (pathLivestockType) {
-      root.classList.add(`theme-${pathLivestockType}`);
-    } else if (lastSelectedType) {
-      root.classList.add(`theme-${lastSelectedType}`);
+    
+    // We only apply enterprise themes if we are NOT on the home page.
+    // This ensures the home page always retains its default blue accent color.
+    if (pathname !== '/home' && pathname !== '/') {
+      if (pathLivestockType) {
+        root.classList.add(`theme-${pathLivestockType}`);
+      } else if (lastSelectedType) {
+        root.classList.add(`theme-${lastSelectedType}`);
+      }
     }
-  }, [pathLivestockType, lastSelectedType]);
+  }, [pathLivestockType, lastSelectedType, pathname]);
 
   if (!isHydrated) {
     return (
